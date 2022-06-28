@@ -24,6 +24,8 @@ static int64 *parse_token(token_t *token)
         return plus();
     if (strcmp(tvalue, "-") == 0)
         return minus();
+    if (strcmp(tvalue, "=") == 0)
+        return equal();
     if (strcmp(tvalue, ".") == 0)
         return dump();
     if (strcmp(tvalue, "halt") == 0)

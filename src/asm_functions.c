@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../include/asm_functions.h"
+#include "asm_functions.h"
 
 void asm_dump(FILE *fd)
 {

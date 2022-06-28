@@ -10,3 +10,6 @@ $ ./output                       # Run the program
 ```
 
 Be aware the Makefile compiles to ELF64 using NASM and ld. If you have other installed, you may change the Makefile to apply them, or install NASM to compile with the default Makefile.
+
+## TODO :
+[ ] Fix the compiler about printing negative numbers. (Ex : ``-10`` -> ``/0``)

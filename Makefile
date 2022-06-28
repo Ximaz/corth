@@ -17,10 +17,13 @@ valgrind: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(CORTH_LIB)
+	make compile_corth_testfile
+	make clean
+
+compile_corth_testfile:
 	./$(NAME) com examples/test.corth
 	nasm -felf64 $(ASM_OUTPUT) -o $(ASM_OBJ)
 	ld $(ASM_OBJ) -o $(ASM)
-	make clean
 
 $(OBJ): src/libcorth.a
 	$(CC) $(CFLAGS) -c $(SRC) $(CORTH_LIB)

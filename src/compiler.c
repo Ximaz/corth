@@ -32,15 +32,15 @@ int compile(program_t *program, char const *output)
                 break;
             case OP_PLUS:
                 fprintf(fd, "    ;; -- PLUS --\n");
-                fprintf(fd, "    pop rax\n");
-                fprintf(fd, "    pop rbx\n");
+                fprintf(fd, "    pop rax      ; n1\n");
+                fprintf(fd, "    pop rbx      ; n2\n");
                 fprintf(fd, "    add rax, rbx\n");
                 fprintf(fd, "    push rax\n");
                 break;
             case OP_MINUS:
                 fprintf(fd, "    ;; -- MINUS --\n");
-                fprintf(fd, "    pop rax\n");
-                fprintf(fd, "    pop rbx\n");
+                fprintf(fd, "    pop rax      ; n1\n");
+                fprintf(fd, "    pop rbx      ; n2\n");
                 fprintf(fd, "    sub rbx, rax\n");
                 fprintf(fd, "    push rbx\n");
                 break;
