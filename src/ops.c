@@ -49,12 +49,3 @@ int64 *dump(void)
         *op = OP_DUMP;
     return op;
 }
-
-int64 *nop(void)
-{
-    int64 *op = (int64 *) malloc(sizeof(int64));
-
-    if (op)
-        *op = OP_NOP;
-    return op;
-}

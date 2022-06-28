@@ -4,94 +4,12 @@
 #include <string.h>
 #include <sys/types.h>
 #include "include/ops.h"
+#include "include/lexer.h"
 #include "include/program.h"
 #include "include/compiler.h"
 #include "include/simulator.h"
 #include "include/file_handler.h"
 
-char *trim_line(char *token)
-{
-    while (*token != 0 && *token <= ' ')
-        token++;
-    return token;
-}
-
-int64 *parse_token_to_op_code(char *token)
-{
-    size_t i = 0;
-    long long n = 0;
-
-    if (strcmp(token, "+") == 0)
-        return plus();
-    if (strcmp(token, "-") == 0)
-        return minus();
-    if (strcmp(token, ".") == 0)
-        return dump();
-    if (strcmp(token, "halt") == 0)
-        return halt();
-    while (token[i] >= '0' && token[i] <= '9') i++;
-    if (i == 0)
-        return nop();
-    if (token[i] == 0) {
-        if (i <= 19) {
-            n = strtoll(token, NULL, 10);
-            return push(n);
-        }
-        if (errno == ERANGE) {
-            printf("ERROR: The number does not fit max value of 'long long'.\n");
-            exit(1);
-        }
-        printf("ERROR: The number does not fit into a 'long long'.\n");
-        exit(1);
-    } else {
-        printf("ERROR: bad token is provided : %s.\n", token);
-        exit(1);
-    }
-}
-
-void parse_instruction(program_t *program, char *instruction)
-{
-    size_t i = 0;
-    char *token = 0;
-
-    instruction = trim_line(instruction);
-    if (!instruction[i])
-        return;
-    while (i < strlen(instruction)) {
-        token = strtok(&instruction[i], " ");
-        if (token) {
-            push_instruction(program, parse_token_to_op_code(token));
-            i += strlen(token);
-        }
-        i++;
-    }
-}
-
-program_t *get_program(char const *input_filename)
-{
-    size_t i = 0;
-    char *instruction = 0;
-    program_t *program;
-    FILE *f = open_file(input_filename, "r");
-    char *buf = read_file(f);
-    size_t buf_sz = strlen(buf);
-
-    fclose(f);
-    program = new_program();
-    // TODO : Handle "\r\n" the same way as "\n" since VSC puts
-    //        "\r\n" on Windows. If the code is then executed
-    //        by a docker or the WSL, it needs to behave the same.
-    while (i < buf_sz) {
-        instruction = strtok(&buf[i], "\n");
-        if (instruction) {
-            parse_instruction(program, instruction);
-            i += strlen(instruction);
-        }
-        i++;
-    }
-    free(buf);
-    return program;
-}
 
 void usage(char const *binary_name)
 {
@@ -121,14 +39,18 @@ int main(int argc, char *const *argv)
     subcommand = argv[1];
     if (strcmp(subcommand, "sim") == 0) {
         filename = argv[2];
-        program_t *program = get_program(filename);
+        tokens_t *tokens = lex_from_file(filename);
+        program_t *program = new_program(tokens);
         err = simulate(program);
         destroy_program(program);
+        destroy_tokens(tokens);
     } else if (strcmp(subcommand, "com") == 0) {
         filename = argv[2];
-        program_t *program = get_program(filename);
+        tokens_t *tokens = lex_from_file(filename);
+        program_t *program = new_program(tokens);
         err = compile(program, "output.asm");
         destroy_program(program);
+        destroy_tokens(tokens);
     } else {
         usage(argv[0]);
         printf("Invalid subcommand is provided.\n");
