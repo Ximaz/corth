@@ -10,66 +10,42 @@
 
 int compile(program_t *program, char const *output)
 {
-    FILE* fd = 0;
+    int err = 0;
+    FILE* f = 0;
     uint64 i = 0;
     int64 *op = NULL;
 
     assert(COUNT_OPS == SUPPORTED_INSTRUCTIONS);
     if (!program)
         return 1;
-    fd = open_file(output, "w");
-    fprintf(fd, "BITS 64\n");
-    fprintf(fd, "segment .text\n");
-    asm_dump(fd);
-    fprintf(fd, "global _start\n");
-    fprintf(fd, "_start:\n");
+    f = open_file(output, "w");
+    asm_header(f);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op[0]) {
             case OP_PUSH:
-                fprintf(fd, "    ;; -- PUSH --\n");
-                fprintf(fd, "    push %lld\n", op[1]);
+                inst_push(f, 0, op[1]);
                 break;
             case OP_PLUS:
-                fprintf(fd, "    ;; -- PLUS --\n");
-                fprintf(fd, "    pop rax      ; n1\n");
-                fprintf(fd, "    pop rbx      ; n2\n");
-                fprintf(fd, "    add rax, rbx\n");
-                fprintf(fd, "    push rax\n");
+                inst_plus(f, 0);
                 break;
             case OP_MINUS:
-                fprintf(fd, "    ;; -- MINUS --\n");
-                fprintf(fd, "    pop rax      ; n1\n");
-                fprintf(fd, "    pop rbx      ; n2\n");
-                fprintf(fd, "    sub rbx, rax\n");
-                fprintf(fd, "    push rbx\n");
+                inst_minus(f, 0);
                 break;
             case OP_EQUAL:
-                fprintf(fd, "    ;; -- EQUAL --\n");
-                fprintf(fd, "    pop rax      ; n1\n");
-                fprintf(fd, "    pop rbx      ; n2\n");
-                fprintf(fd, "    cmp rbx, rax\n");
-                fprintf(fd, "    xor rax, rax\n");
-                fprintf(fd, "    sete al\n");
-                fprintf(fd, "    push rax\n");
+                inst_equal(f, 0);
                 break;
             case OP_DUMP:
-                fprintf(fd, "    ;; -- DUMP --\n");
-                fprintf(fd, "    pop rdi\n");
-                fprintf(fd, "    call _print_int\n");
+                inst_dump(f, 0);
                 break;
             case OP_HALT:
-                fprintf(fd, "    ;; -- HALT --\n");
-                fprintf(fd, "    mov rax, 60\n");
-                fprintf(fd, "    pop rdi\n");
-                fprintf(fd, "    syscall\n");
-                fprintf(fd, "    retn\n");
+                err = inst_halt(f, 0);
                 break;
             default:
-                printf("Unreachable\n");
+                printf("Unreachable.\n");
                 break;
         }
     }
-    fclose(fd);
-    return 0;
+    fclose(f);
+    return err;
 }

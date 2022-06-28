@@ -1,35 +1,178 @@
 #include <stdio.h>
-#include "asm_functions.h"
+#include <stdlib.h>
+#include <assert.h>
+#include "../include/ops.h"
+#include "../include/util.h"
+#include "../include/stack.h"
+#include "../include/asm_functions.h"
 
-void asm_dump(FILE *fd)
+void asm_dump(FILE *f)
 {
-    fprintf(fd, "_print_int:\n");
-    fprintf(fd, "    mov r8, 7378697629483820647\n");
-    fprintf(fd, "    sub rsp, 40\n");
-    fprintf(fd, "    mov byte [rsp+31], 10\n");
-    fprintf(fd, "    lea rcx, [rsp+30]\n");
-    fprintf(fd, "_print_int_L1:\n");
-    fprintf(fd, "    mov rax, rdi\n");
-    fprintf(fd, "    mov rsi, rcx\n");
-    fprintf(fd, "    sub rcx, 1\n");
-    fprintf(fd, "    imul r8\n");
-    fprintf(fd, "    mov rax, rdi\n");
-    fprintf(fd, "    sar rax, 63\n");
-    fprintf(fd, "    sar rdx, 2\n");
-    fprintf(fd, "    sub rdx, rax\n");
-    fprintf(fd, "    lea rax, [rdx+rdx*4]\n");
-    fprintf(fd, "    add rax, rax\n");
-    fprintf(fd, "    sub rdi, rax\n");
-    fprintf(fd, "    add edi, 48\n");
-    fprintf(fd, "    mov byte [rcx+1], dil\n");
-    fprintf(fd, "    mov rdi, rdx\n");
-    fprintf(fd, "    test rdx, rdx\n");
-    fprintf(fd, "    jne _print_int_L1\n");
-    fprintf(fd, "    lea rdx, [rsp+32]\n");
-    fprintf(fd, "    mov edi, 1\n");
-    fprintf(fd, "    sub rdx, rsi\n");
-    fprintf(fd, "    mov rax, 1\n");
-    fprintf(fd, "    syscall\n");
-    fprintf(fd, "    add rsp, 40\n");
-    fprintf(fd, "    ret\n");
+    fprintf(f, "dump:\n");
+    fprintf(f, "    mov r8, 7378697629483820647\n");
+    fprintf(f, "    sub rsp, 40\n");
+    fprintf(f, "    mov byte [rsp+31], 10\n");
+    fprintf(f, "    lea rcx, [rsp+30]\n");
+    fprintf(f, "dump_L1:\n");
+    fprintf(f, "    mov rax, rdi\n");
+    fprintf(f, "    mov rsi, rcx\n");
+    fprintf(f, "    sub rcx, 1\n");
+    fprintf(f, "    imul r8\n");
+    fprintf(f, "    mov rax, rdi\n");
+    fprintf(f, "    sar rax, 63\n");
+    fprintf(f, "    sar rdx, 2\n");
+    fprintf(f, "    sub rdx, rax\n");
+    fprintf(f, "    lea rax, [rdx+rdx*4]\n");
+    fprintf(f, "    add rax, rax\n");
+    fprintf(f, "    sub rdi, rax\n");
+    fprintf(f, "    add edi, 48\n");
+    fprintf(f, "    mov byte [rcx+1], dil\n");
+    fprintf(f, "    mov rdi, rdx\n");
+    fprintf(f, "    test rdx, rdx\n");
+    fprintf(f, "    jne dump_L1\n");
+    fprintf(f, "    lea rdx, [rsp+32]\n");
+    fprintf(f, "    mov edi, 1\n");
+    fprintf(f, "    sub rdx, rsi\n");
+    fprintf(f, "    mov rax, 1\n");
+    fprintf(f, "    syscall\n");
+    fprintf(f, "    add rsp, 40\n");
+    fprintf(f, "    ret\n");
+}
+
+void asm_header(FILE *f)
+{
+    fprintf(f, "BITS 64\n");
+    fprintf(f, "segment .text\n");
+    asm_dump(f);
+    fprintf(f, "global _start\n");
+    fprintf(f, "_start:\n");
+}
+
+void inst_dump(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+
+    if (stack) {
+        n1 = pop_from(stack);
+        printf("%lld\n", n1);
+        return;
+    }
+    if (f) {
+        fprintf(f, "    ;; -- DUMP --\n");
+        fprintf(f, "    pop rdi\n");
+        fprintf(f, "    call dump\n");
+        return;
+    }
+    printf("Unreachable.\n");
+    exit(1);
+}
+
+void inst_push(FILE *f, stack_t *stack, int64 n)
+{
+    assert(f || stack);
+
+    if (stack) {
+        push_onto_stack(stack, n);
+        return;
+    }
+    if (f) {
+        fprintf(f, "    ;; -- PUSH --\n");
+        fprintf(f, "    push %lld\n", n);
+        return;
+    }
+    printf("Unreachable.\n");
+    exit(1);
+}
+
+void inst_plus(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+    int64 n2 = 0;
+
+    if (stack) {
+        n1 = pop_from(stack);
+        n2 = pop_from(stack);
+        push_onto_stack(stack, n1 + n2);
+        return;
+    }
+    if (f) {
+        fprintf(f, "    ;; -- PLUS --\n");
+        fprintf(f, "    pop rax      ; n1\n");
+        fprintf(f, "    pop rbx      ; n2\n");
+        fprintf(f, "    add rax, rbx\n");
+        fprintf(f, "    push rax\n");
+        return;
+    }
+    printf("Unreachable.\n");
+    exit(1);
+}
+
+void inst_minus(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+    int64 n2 = 0;
+
+    if (stack) {
+        n1 = pop_from(stack);
+        n2 = pop_from(stack);
+        push_onto_stack(stack, n2 - n1);
+        return;
+    }
+    if (f) {
+        fprintf(f, "    ;; -- MINUS --\n");
+        fprintf(f, "    pop rax      ; n1\n");
+        fprintf(f, "    pop rbx      ; n2\n");
+        fprintf(f, "    sub rbx, rax\n");
+        fprintf(f, "    push rbx\n");
+        return;
+    }
+    printf("Unreachable.\n");
+    exit(1);
+}
+
+void inst_equal(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+    int64 n2 = 0;
+
+    if (stack) {
+        n1 = pop_from(stack);
+        n2 = pop_from(stack);
+        push_onto_stack(stack, n1 == n2);
+        return;
+    }
+    if (f) {
+        fprintf(f, "    ;; -- EQUAL --\n");
+        fprintf(f, "    pop rax      ; n1\n");
+        fprintf(f, "    pop rbx      ; n2\n");
+        fprintf(f, "    cmp rbx, rax\n");
+        fprintf(f, "    xor rax, rax\n");
+        fprintf(f, "    sete al\n");
+        fprintf(f, "    push rax\n");
+        return;
+    }
+    printf("Unreachable.\n");
+    exit(1);
+}
+
+int inst_halt(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+
+    if (stack)
+        return pop_from(stack) % 256;
+    if (f) {
+        fprintf(f, "    ;; -- HALT --\n");
+        fprintf(f, "    mov rax, 60\n");
+        fprintf(f, "    pop rdi\n");
+        fprintf(f, "    syscall\n");
+        fprintf(f, "    retn\n");
+        return 0;
+    }
+    printf("Unreachable.\n");
+    exit(1);
 }
