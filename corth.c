@@ -1,138 +1,94 @@
 #include <stdio.h>
+#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+#include <sys/types.h>
 #include "include/ops.h"
-#include "include/util.h"
-#include "include/stack.h"
 #include "include/program.h"
-#include "include/asm_functions.h"
+#include "include/compiler.h"
+#include "include/simulator.h"
+#include "include/file_handler.h"
 
-
-static uint64 const SUPPORTED_INSTRUCTIONS = 5;
-
-
-int simulate(program_t *program)
+char *trim_line(char *token)
 {
-    int err = 0;
-    uint64 i = 0;
-    int64 n1 = 0;
-    int64 n2 = 0;
-    int64 *op = NULL;
-    stack_t *stack;
-
-    assert(COUNT_OPS == SUPPORTED_INSTRUCTIONS);
-    if (!program)
-        return 1;
-    stack = new_stack();
-    if (!stack)
-        return 1;
-    for (; i < program->instructions_len; i++) {
-        op = program->instructions[i];
-        switch (op[0]) {
-            case OP_PUSH:
-                push_onto_stack(stack, op[1]);
-                break;
-            case OP_PLUS:
-                n1 = pop_from(stack);
-                n2 = pop_from(stack);
-                push_onto_stack(stack, n1 + n2);
-                break;
-            case OP_MINUS:
-                n1 = pop_from(stack);
-                n2 = pop_from(stack);
-                push_onto_stack(stack, n2 - n1);
-                break;
-            case OP_DUMP:
-                n1 = pop_from(stack);
-                printf("%lld\n", n1);
-                break;
-            case OP_HALT:
-                err = pop_from(stack);
-                break;
-            default:
-                printf("Unreachable\n");
-                break;
-        }
-    }
-    destroy_stack(stack);
-    return err;
+    while (*token != 0 && *token <= ' ')
+        token++;
+    return token;
 }
 
-int compile(program_t *program, char const *output)
+int64 *parse_token_to_op_code(char *token)
 {
-    FILE* fd = 0;
-    uint64 i = 0;
-    int64 *op = NULL;
+    size_t i = 0;
+    long long n = 0;
 
-    assert(COUNT_OPS == SUPPORTED_INSTRUCTIONS);
-    if (!program)
-        return 1;
-    fd = fopen(output, "w");
-    if (!fd)
-        return 1;
-    fprintf(fd, "BITS 64\n");
-    fprintf(fd, "segment .text\n");
-    asm_dump(fd);
-    fprintf(fd, "global _start\n");
-    fprintf(fd, "_start:\n");
-    for (; i < program->instructions_len; i++) {
-        op = program->instructions[i];
-        switch (op[0]) {
-            case OP_PUSH:
-                fprintf(fd, "    ;; -- PUSH --\n");
-                fprintf(fd, "    push %lld\n", op[1]);
-                break;
-            case OP_PLUS:
-                fprintf(fd, "    ;; -- PLUS --\n");
-                fprintf(fd, "    pop rax\n");
-                fprintf(fd, "    pop rbx\n");
-                fprintf(fd, "    add rax, rbx\n");
-                fprintf(fd, "    push rax\n");
-                break;
-            case OP_MINUS:
-                fprintf(fd, "    ;; -- MINUS --\n");
-                fprintf(fd, "    pop rax\n");
-                fprintf(fd, "    pop rbx\n");
-                fprintf(fd, "    sub rbx, rax\n");
-                fprintf(fd, "    push rbx\n");
-                break;
-            case OP_DUMP:
-                fprintf(fd, "    ;; -- DUMP --\n");
-                fprintf(fd, "    pop rdi\n");
-                fprintf(fd, "    call _print_int\n");
-                break;
-            case OP_HALT:
-                fprintf(fd, "    ;; -- HALT --\n");
-                fprintf(fd, "    mov rax, 60\n");
-                fprintf(fd, "    pop rdi\n");
-                fprintf(fd, "    syscall\n");
-                fprintf(fd, "    retn\n");
-                break;
-            default:
-                printf("Unreachable\n");
-                break;
+    if (strcmp(token, "+") == 0)
+        return plus();
+    if (strcmp(token, "-") == 0)
+        return minus();
+    if (strcmp(token, ".") == 0)
+        return dump();
+    if (strcmp(token, "halt") == 0)
+        return halt();
+    while (token[i] >= '0' && token[i] <= '9') i++;
+    if (i == 0)
+        return nop();
+    if (token[i] == 0) {
+        if (i <= 19) {
+            n = strtoll(token, NULL, 10);
+            return push(n);
         }
+        if (errno == ERANGE) {
+            printf("ERROR: The number does not fit max value of 'long long'.\n");
+            exit(1);
+        }
+        printf("ERROR: The number does not fit into a 'long long'.\n");
+        exit(1);
+    } else {
+        printf("ERROR: bad token is provided : %s.\n", token);
+        exit(1);
     }
-    fclose(fd);
-    return 0;
 }
 
-
-program_t *hardcoded_program(void)
+void parse_instruction(program_t *program, char *instruction)
 {
-    program_t *program = new_program();
+    size_t i = 0;
+    char *token = 0;
 
-    push_instruction(program, push(34));
-    push_instruction(program, push(35));
-    push_instruction(program, plus());
-    push_instruction(program, dump());
-    push_instruction(program, push(500));
-    push_instruction(program, push(80));
-    push_instruction(program, minus());
-    push_instruction(program, dump());
-    push_instruction(program, push(0));
-    push_instruction(program, halt());
+    instruction = trim_line(instruction);
+    if (!instruction[i])
+        return;
+    while (i < strlen(instruction)) {
+        token = strtok(&instruction[i], " ");
+        if (token) {
+            push_instruction(program, parse_token_to_op_code(token));
+            i += strlen(token);
+        }
+        i++;
+    }
+}
+
+program_t *get_program(char const *input_filename)
+{
+    size_t i = 0;
+    char *instruction = 0;
+    program_t *program;
+    FILE *f = open_file(input_filename, "r");
+    char *buf = read_file(f);
+    size_t buf_sz = strlen(buf);
+
+    fclose(f);
+    program = new_program();
+    // TODO : Faire en sorte que les retours à la ligne n'empêchent pas
+    // TODO : l'exécution du programme.
+    while (i < buf_sz) {
+        instruction = strtok(&buf[i], ";");
+        if (instruction) {
+            parse_instruction(program, instruction);
+            i += strlen(instruction);
+        }
+        i++;
+    }
+    free(buf);
     return program;
 }
 
@@ -140,27 +96,36 @@ void usage(char const *binary_name)
 {
     printf("Usage : %s <SUBCOMMAND> program\n", binary_name);
     printf("SUBCOMMANDS :\n");
-    printf("    sim        Simulate the program\n");
-    printf("    com        Compile the program\n");
+    printf("    sim <filename>    Simulate the program from the specified filename.\n");
+    printf("    com <filename>    Compile the program from the specified filename.\n");
 }
 
 int main(int argc, char *const *argv)
 {
     int err = 0;
-    char *subcommand = 0;
+    char const *filename = 0;
+    char const *subcommand = 0;
+    char const *binary_name = argv[0];
 
-    if (argc < 2) {
-        usage(argv[0]);
+    if (argc == 1) {
+        usage(binary_name);
         printf("ERROR: No subcommand is provided.\n");
+        return 1;
+    }
+    if (argc == 2) {
+        usage(binary_name);
+        printf("ERROR: No input is provided.\n");
         return 1;
     }
     subcommand = argv[1];
     if (strcmp(subcommand, "sim") == 0) {
-        program_t *program = hardcoded_program();
+        filename = argv[2];
+        program_t *program = get_program(filename);
         err = simulate(program);
         destroy_program(program);
     } else if (strcmp(subcommand, "com") == 0) {
-        program_t *program = hardcoded_program();
+        filename = argv[2];
+        program_t *program = get_program(filename);
         err = compile(program, "output.asm");
         destroy_program(program);
     } else {

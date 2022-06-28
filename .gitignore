@@ -2,3 +2,4 @@
 output
 corth
 *.asm
+src/libcorth.a
