@@ -4,9 +4,9 @@ It's like [Porth](https://gitlab.com/tsoding/porth), which itself is like Forth,
 ## Quick Start
 
 ```console
-$ make && ./corth sim # Simulate the program
-$ make && ./corth com # Compile the program
-$ ./output            # Run the program
+$ make && ./corth sim <filename> # Simulate the program
+$ make && ./corth com <filename> # Compile the program
+$ ./output                       # Run the program
 ```
 
 Be aware the Makefile compiles to ELF64 using NASM and ld. If you have other installed, you may change the Makefile to apply them, or install NASM to compile with the default Makefile.
