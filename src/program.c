@@ -1,24 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../include/util.h"
+#include "../include/token.h"
 #include "../include/program.h"
 
-program_t *new_program(void)
+program_t *new_program(tokens_t *tokens)
 {
-    program_t *program = (program_t *)malloc(sizeof(program_t));
+    size_t i = 0;
+    program_t *program = 0;
+
+    if (!tokens)
+        return program;
+    program = (program_t *)malloc(sizeof(program_t));
     if (!program)
         return program;
-    program->instructions_len = 0;
-    program->instructions = (int64 **) calloc(1, sizeof(int64 *));
+    program->instructions_len = tokens->tokens_len;
+    program->instructions = (int64 **) calloc(tokens->tokens_len, sizeof(int64 *));
+    for (; i < tokens->tokens_len; i++)
+        program->instructions[i] = tokens->tokens[i]->instruction;
     return program;
-}
-
-void push_instruction(program_t *self, int64 *instruction)
-{
-    if (!self->instructions)
-        return;
-    self->instructions[self->instructions_len++] = instruction;
-    self->instructions = (int64 **) realloc(self->instructions, (self->instructions_len + 1) * sizeof(int64 *));
 }
 
 void destroy_program(program_t *self)

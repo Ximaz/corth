@@ -56,8 +56,6 @@ int compile(program_t *program, char const *output)
                 fprintf(fd, "    syscall\n");
                 fprintf(fd, "    retn\n");
                 break;
-            case OP_NOP:
-                break;
             default:
                 printf("Unreachable\n");
                 break;

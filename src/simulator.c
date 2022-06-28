@@ -44,8 +44,6 @@ int simulate(program_t *program)
             case OP_HALT:
                 err = pop_from(stack);
                 break;
-            case OP_NOP:
-                break;
             default:
                 printf("Unreachable\n");
                 break;

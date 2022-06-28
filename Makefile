@@ -13,7 +13,7 @@ ASM=$(ASM_OUTPUT:.asm=)
 all: $(NAME)
 
 valgrind: $(NAME)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --log-file=$(VALGRIND_LOGS_FILE) ./$(NAME) com test.corth
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --log-file=$(VALGRIND_LOGS_FILE) ./$(NAME) sim examples/test.corth
 
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(CORTH_LIB)
