@@ -10,8 +10,7 @@
 
 static void token_error(char const *error, token_t *token)
 {
-    printf("%s", error);
-    printf(" \"%s\" in %s:%llu:%llu.\n", token->token, token->filename, token->row, token->col);
+    printf("%s:%llu:%llu: %s: \"%s\"\n", token->filename, token->row, token->col, error, token->token);
     exit(1);
 }
 
@@ -36,10 +35,10 @@ static int64 *parse_token(token_t *token)
             return push(n);
         }
         if (errno == ERANGE)
-            token_error("ERROR: The number does not fit max value of 'long long'.", token);
-        token_error("ERROR: The number does not fit into a 'long long'.", token);
+            token_error("number wont fit into int64 bits", token);
+        token_error("number wont fit into int64 bits (might be a uint64 error)", token);
     }
-    token_error("ERROR: Unknowned token.", token);
+    token_error("unexpected token", token);
     return 0;
 }
 
