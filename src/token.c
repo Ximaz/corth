@@ -3,18 +3,19 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include "../include/ops.h"
 #include "../include/util.h"
 #include "../include/token.h"
 
-void token_error(char const *error, token_t *token)
+static void token_error(char const *error, token_t *token)
 {
     printf("%s", error);
     printf(" \"%s\" in %s:%llu:%llu.\n", token->token, token->filename, token->row, token->col);
     exit(1);
 }
 
-int64 *parse_token(token_t *token)
+static int64 *parse_token(token_t *token)
 {
     uint64 i = 0;
     int64 n = 0;

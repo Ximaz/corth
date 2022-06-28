@@ -1,6 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static size_t flen(FILE *f)
+{
+    size_t l = 0;
+
+    fseek(f, 0, SEEK_END);
+    l = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    return l;
+}
+
 FILE *open_file(char const *filename, char const *mode)
 {
     FILE *f = fopen(filename, mode);
@@ -9,16 +19,6 @@ FILE *open_file(char const *filename, char const *mode)
         exit(1);
     }
     return f;
-}
-
-size_t flen(FILE *f)
-{
-    size_t l = 0;
-
-    fseek(f, 0, SEEK_END);
-    l = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    return l;
 }
 
 char *read_file(FILE *f)

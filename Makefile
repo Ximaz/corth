@@ -17,9 +17,9 @@ valgrind: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(CORTH_LIB)
-# ./$(NAME) com examples/test.corth
-# nasm -felf64 $(ASM_OUTPUT) -o $(ASM_OBJ)
-# ld $(ASM_OBJ) -o $(ASM)
+	./$(NAME) com examples/test.corth
+	nasm -felf64 $(ASM_OUTPUT) -o $(ASM_OBJ)
+	ld $(ASM_OBJ) -o $(ASM)
 	make clean
 
 $(OBJ): src/libcorth.a

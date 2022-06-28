@@ -1,17 +1,12 @@
 #include <stdio.h>
-#include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
-#include "include/ops.h"
 #include "include/lexer.h"
 #include "include/program.h"
 #include "include/compiler.h"
 #include "include/simulator.h"
-#include "include/file_handler.h"
 
-
-void usage(char const *binary_name)
+static void usage(char const *binary_name)
 {
     printf("Usage : %s <SUBCOMMAND> program\n", binary_name);
     printf("SUBCOMMANDS :\n");
