@@ -39,6 +39,11 @@ int64 *minus(void)
     return new_op(OP_MINUS, 0);
 }
 
+int64 *equal(void)
+{
+    return new_op(OP_EQUAL, 0);
+}
+
 int64 *dump(void)
 {
     return new_op(OP_DUMP, 0);

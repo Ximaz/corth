@@ -37,6 +37,11 @@ int simulate(program_t *program)
                 n2 = pop_from(stack);
                 push_onto_stack(stack, n2 - n1);
                 break;
+            case OP_EQUAL:
+                n1 = pop_from(stack);
+                n2 = pop_from(stack);
+                push_onto_stack(stack, n1 == n2);
+                break;
             case OP_DUMP:
                 n1 = pop_from(stack);
                 printf("%lld\n", n1);

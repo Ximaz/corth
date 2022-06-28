@@ -44,6 +44,15 @@ int compile(program_t *program, char const *output)
                 fprintf(fd, "    sub rbx, rax\n");
                 fprintf(fd, "    push rbx\n");
                 break;
+            case OP_EQUAL:
+                fprintf(fd, "    ;; -- EQUAL --\n");
+                fprintf(fd, "    pop rax      ; n1\n");
+                fprintf(fd, "    pop rbx      ; n2\n");
+                fprintf(fd, "    cmp rbx, rax\n");
+                fprintf(fd, "    xor rax, rax\n");
+                fprintf(fd, "    sete al\n");
+                fprintf(fd, "    push rax\n");
+                break;
             case OP_DUMP:
                 fprintf(fd, "    ;; -- DUMP --\n");
                 fprintf(fd, "    pop rdi\n");
