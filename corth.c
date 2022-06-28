@@ -60,6 +60,7 @@ void parse_instruction(program_t *program, char *instruction)
     while (i < strlen(instruction)) {
         token = strtok(&instruction[i], " ");
         if (token) {
+            printf("%s\n", token);
             push_instruction(program, parse_token_to_op_code(token));
             i += strlen(token);
         }
@@ -81,7 +82,7 @@ program_t *get_program(char const *input_filename)
     // TODO : Faire en sorte que les retours à la ligne n'empêchent pas
     // TODO : l'exécution du programme.
     while (i < buf_sz) {
-        instruction = strtok(&buf[i], ";");
+        instruction = strtok(&buf[i], "\n");
         if (instruction) {
             parse_instruction(program, instruction);
             i += strlen(instruction);
