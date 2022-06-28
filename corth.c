@@ -60,7 +60,6 @@ void parse_instruction(program_t *program, char *instruction)
     while (i < strlen(instruction)) {
         token = strtok(&instruction[i], " ");
         if (token) {
-            printf("%s\n", token);
             push_instruction(program, parse_token_to_op_code(token));
             i += strlen(token);
         }
@@ -79,8 +78,9 @@ program_t *get_program(char const *input_filename)
 
     fclose(f);
     program = new_program();
-    // TODO : Faire en sorte que les retours à la ligne n'empêchent pas
-    // TODO : l'exécution du programme.
+    // TODO : Handle "\r\n" the same way as "\n" since VSC puts
+    //        "\r\n" on Windows. If the code is then executed
+    //        by a docker or the WSL, it needs to behave the same.
     while (i < buf_sz) {
         instruction = strtok(&buf[i], "\n");
         if (instruction) {
