@@ -18,9 +18,8 @@ int64 *push(int64 n)
 {
     int64 *op = new_op(OP_PUSH, 1);
 
-    if (!op)
-        return op;
-    op[1] = n;
+    if (op)
+        op[1] = n;
     return op;
 }
 
@@ -47,4 +46,18 @@ int64 *equal(void)
 int64 *dump(void)
 {
     return new_op(OP_DUMP, 0);
+}
+
+int64 *iff(void)
+{
+    int64 *op = new_op(OP_IF, 1);
+
+    if (op)
+        op[1] = -1; // Invalid pointer to `end`.
+    return op;
+}
+
+int64 *end(void)
+{
+    return new_op(OP_END, 0);
 }

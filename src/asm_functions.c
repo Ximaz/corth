@@ -176,3 +176,17 @@ int inst_halt(FILE *f, stack_t *stack)
     printf("Unreachable.\n");
     exit(1);
 }
+
+int inst_if(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+
+    if (stack) {
+        n1 = pop_from(stack);
+        return (n1 == 0);
+    }
+    else {
+        return 0;
+    }
+}

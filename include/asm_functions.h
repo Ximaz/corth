@@ -12,5 +12,6 @@ void inst_plus(FILE *f, stack_t *stack);
 void inst_minus(FILE *f, stack_t *stack);
 void inst_equal(FILE *f, stack_t *stack);
 int inst_halt(FILE *f, stack_t *stack);
+int inst_if(FILE *f, stack_t *stack);
 
 #endif

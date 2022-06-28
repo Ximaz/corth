@@ -14,5 +14,4 @@ stack_t *new_stack(void);
 void destroy_stack(stack_t *self);
 void push_onto_stack(stack_t *self, int64 element);
 int64 pop_from(stack_t *self);
-
 #endif

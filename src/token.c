@@ -30,6 +30,10 @@ static int64 *parse_token(token_t *token)
         return dump();
     if (strcmp(tvalue, "halt") == 0)
         return halt();
+    if (strcmp(tvalue, "if") == 0)
+        return iff();
+    if (strcmp(tvalue, "end") == 0)
+        return end();
     while (tvalue[i] >= '0' && tvalue[i] <= '9') i++;
     if (tvalue[i] == 0) {
         if (i <= 19) {

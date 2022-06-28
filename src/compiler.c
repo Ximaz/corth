@@ -38,6 +38,12 @@ int compile(program_t *program, char const *output)
             case OP_DUMP:
                 inst_dump(f, 0);
                 break;
+            case OP_IF:
+                // NOT IMPLEMENTED YET
+                assert(0);
+                break;
+            case OP_END:
+                break;
             case OP_HALT:
                 err = inst_halt(f, 0);
                 break;

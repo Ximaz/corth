@@ -2,7 +2,7 @@ CC=gcc
 NAME=libcorth.a
 SRC=*.c
 OBJ=*.o
-CFLAGS=-Wall -Wextra -Werror -Wdeprecated -pedantic -g -O0 -I../include/
+CFLAGS=-Wall -Wextra -Werror -Wdeprecated -Wno-comment -pedantic -g -O0 -I../include/
 
 all: $(NAME)
 

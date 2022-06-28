@@ -3,7 +3,7 @@ NAME=corth
 SRC=*.c
 OBJ=*.o
 CORTH_LIB=-Iinclude/ -Lsrc -lcorth
-CFLAGS=-Wall -Wextra -Werror -Wdeprecated -pedantic -g -O0
+CFLAGS=-Wall -Wextra -Werror -Wdeprecated -Wno-comment -pedantic -g -O0
 VALGRIND_LOGS_FILE=valgrind-out.txt
 GDB_TMP_FILES=.gdb_history peda-session-*.txt
 ASM_OUTPUT=output.asm
@@ -17,13 +17,13 @@ valgrind: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(CORTH_LIB)
-	make compile_corth_testfile
+# make compile_corth_testfile
 	make clean
 
-compile_corth_testfile:
-	./$(NAME) com examples/test.corth
-	nasm -felf64 $(ASM_OUTPUT) -o $(ASM_OBJ)
-	ld $(ASM_OBJ) -o $(ASM)
+# compile_corth_testfile:
+# 	./$(NAME) sim examples/test.corth
+# 	nasm -felf64 $(ASM_OUTPUT) -o $(ASM_OBJ)
+# 	ld $(ASM_OBJ) -o $(ASM)
 
 $(OBJ): src/libcorth.a
 	$(CC) $(CFLAGS) -c $(SRC) $(CORTH_LIB)

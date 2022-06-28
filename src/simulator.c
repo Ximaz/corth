@@ -5,6 +5,7 @@
 #include "../include/util.h"
 #include "../include/stack.h"
 #include "../include/program.h"
+#include "../include/debugger.h"
 #include "../include/asm_functions.h"
 
 int simulate(program_t *program)
@@ -20,6 +21,7 @@ int simulate(program_t *program)
     stack = new_stack();
     if (!stack)
         return 1;
+    debug_stack(stack, COUNT_OPS);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op[0]) {
@@ -38,6 +40,15 @@ int simulate(program_t *program)
             case OP_DUMP:
                 inst_dump(0, stack);
                 break;
+            case OP_IF:
+                if (inst_if(0, stack)) {
+                    // `preprocess_program` must be called.
+                    assert(op[1] >= 0);
+                    i = op[1];
+                }
+                break;
+            case OP_END:
+                break;
             case OP_HALT:
                 err = inst_halt(0, stack);
                 break;
@@ -45,6 +56,7 @@ int simulate(program_t *program)
                 printf("Unreachable.\n");
                 break;
         }
+        debug_stack(stack, op[0]);
     }
     destroy_stack(stack);
     return err;

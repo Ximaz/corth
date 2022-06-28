@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "../include/stack.h"
 
@@ -25,5 +26,9 @@ void push_onto_stack(stack_t *self, int64 element)
 
 int64 pop_from(stack_t *self)
 {
+    if (self->top == 0) {
+        printf("Stack is empty. Use debug_stack to see what happened.\n");
+        exit(0);
+    }
     return self->elements[--self->top];
 }
