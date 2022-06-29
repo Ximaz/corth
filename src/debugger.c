@@ -2,19 +2,32 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/ops.h"
+#include "../include/util.h"
 #include "../include/stack.h"
 
-void debug_stack(stack_t *stack, op_code_t op_code)
+void debug_stack(stack_t *stack, int64 *op)
 {
     char n[21];
-    uint64 n_len = 0;
-    int64 i = stack->top - 1;
     uint64 j = 0;
+    uint64 n_len = 0;
+    int64 op_arg_i = 0;
+    int64 i = stack->top - 1;
 
-    if (op_code == COUNT_OPS)
+    if (!op)
         printf("\nPROGRAM BEGINS\n");
-    else
-        printf("\nOP CODE : %s\n", op_codes[op_code]);
+    else {
+        printf("\nOP CODE : %s\nARGC : %lld\nARGV : ", op_codes[op[0]], op[1]);
+        if (op[1] == 0)
+            printf("No argument found.");
+        else {
+            for (; op_arg_i < op[1]; op_arg_i++) {
+                printf("%lld", op[op_arg_i + 2]);
+                if (op_arg_i < op[1] - 1)
+                    printf(" ");
+            }
+        }
+        printf("\n");
+    }
     printf("|------------------------|\n");
     for (; i >= 0 ; i--) {
         sprintf(n, "%lld", stack->elements[i]);

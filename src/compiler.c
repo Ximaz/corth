@@ -24,7 +24,7 @@ int compile(program_t *program, char const *output)
         op = program->instructions[i];
         switch (op[0]) {
             case OP_PUSH:
-                inst_push(f, 0, op[1]);
+                inst_push(f, 0, op[2]);
                 break;
             case OP_PLUS:
                 inst_plus(f, 0);

@@ -23,7 +23,7 @@ program_t *preprocess_program(program_t *program)
             case OP_END:
                 open_ptr = pop_from(stack);
                 assert(program->instructions[open_ptr][0] == OP_IF);
-                program->instructions[open_ptr][1] = i;
+                program->instructions[open_ptr][2] = i;
                 break;
             default:
                 // Not handling other cases, it's just for blocks.

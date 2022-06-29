@@ -17,6 +17,8 @@ static void usage(char const *binary_name)
 int main(int argc, char *const *argv)
 {
     int err = 0;
+    tokens_t *tokens = 0;
+    program_t *program = 0;
     char const *filename = 0;
     char const *subcommand = 0;
     char const *binary_name = argv[0];
@@ -32,24 +34,19 @@ int main(int argc, char *const *argv)
         return 1;
     }
     subcommand = argv[1];
-    if (strcmp(subcommand, "sim") == 0) {
-        filename = argv[2];
-        tokens_t *tokens = lex_from_file(filename);
-        program_t *program = new_program(tokens);
+    filename = argv[2];
+    tokens = lex_from_file(filename);
+    program = new_program(tokens);
+    if (strcmp(subcommand, "sim") == 0)
         err = simulate(program);
-        destroy_program(program);
-        destroy_tokens(tokens);
-    } else if (strcmp(subcommand, "com") == 0) {
-        filename = argv[2];
-        tokens_t *tokens = lex_from_file(filename);
-        program_t *program = new_program(tokens);
+    else if (strcmp(subcommand, "com") == 0)
         err = compile(program, "output.asm");
-        destroy_program(program);
-        destroy_tokens(tokens);
-    } else {
+    else {
         usage(argv[0]);
-        printf("Invalid subcommand is provided.\n");
-        return 1;
+        printf("ERROR: Invalid subcommand is provided.\n");
+        err = 1;
     }
+    destroy_program(program);
+    destroy_tokens(tokens);
     return err;
 }
