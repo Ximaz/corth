@@ -82,3 +82,23 @@ int64 *dup(void)
 {
     return new_op(OP_DUP, 0);
 }
+
+int64 *gt(void)
+{
+    return new_op(OP_GT, 0);
+}
+
+int64 *lt(void)
+{
+    return new_op(OP_LT, 0);
+}
+
+int64 *goet(void)
+{
+    return new_op(OP_GOET, 0);
+}
+
+int64 *loet(void)
+{
+    return new_op(OP_LOET, 0);
+}

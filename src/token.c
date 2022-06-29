@@ -24,18 +24,26 @@ static int64 *parse_token(token_t *token)
         return plus();
     if (strcmp(tvalue, "-") == 0)
         return minus();
-    if (strcmp(tvalue, "=") == 0)
-        return equal();
     if (strcmp(tvalue, ".") == 0)
         return dump();
+    if (strcmp(tvalue, "dup") == 0)
+        return dup();
+    if (strcmp(tvalue, "=") == 0)
+        return equal();
+    if (strcmp(tvalue, ">") == 0)
+        return gt();
+    if (strcmp(tvalue, "<") == 0)
+        return lt();
+    if (strcmp(tvalue, ">=") == 0)
+        return goet();
+    if (strcmp(tvalue, "<=") == 0)
+        return loet();
     if (strcmp(tvalue, "if") == 0)
         return iff();
     if (strcmp(tvalue, "else") == 0)
         return elsee();
     if (strcmp(tvalue, "end") == 0)
         return end();
-    if (strcmp(tvalue, "dup") == 0)
-        return dup();
     if (strcmp(tvalue, "halt") == 0)
         return halt();
     while (tvalue[i] >= '0' && tvalue[i] <= '9') i++;

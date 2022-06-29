@@ -13,3 +13,4 @@ Be aware the Makefile compiles to ELF64 using NASM and ld. If you have other ins
 
 ## TODO :
 - [ ] Fix the compiler about printing negative numbers. (Ex : ``-10`` -> ``/0``)
+- [X] Fix the lexer about handling ``\r\n`` (Win) **AND** ``\n`` (Unix)

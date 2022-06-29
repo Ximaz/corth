@@ -17,7 +17,7 @@ static program_t *preprocess_program(program_t *program)
     uint64 open_ptr = 0;
     stack_t *stack = new_stack();
 
-    assert(COUNT_OPS == 10);
+    assert(COUNT_OPS == 14);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op[0]) {
@@ -59,7 +59,7 @@ static void show_program(program_t *self)
     printf("[\n");
     for (; i < self->instructions_len; i++) {
         op = self->instructions[i],
-        printf("    (%s, ", op_codes[op[0]]);
+        printf("%lld    (%s, ", i, op_codes[op[0]]);
         for (; j < op[1]; j++)
             printf("%lld, ", op[j + 2]);
         printf("),\n");
@@ -93,7 +93,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     FILE* f = 0;
     stack_t *stack = 0;
 
-    assert(COUNT_OPS == 10);
+    assert(COUNT_OPS == 14);
     if (!self)
         return 1;
     if (sim) {
@@ -152,6 +152,18 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 break;
             case OP_DUP:
                 inst_dup(f, stack);
+                break;
+            case OP_GT:
+                inst_gt(f, stack);
+                break;
+            case OP_LT:
+                inst_lt(f, stack);
+                break;
+            case OP_GOET:
+                inst_goet(f, stack);
+                break;
+            case OP_LOET:
+                inst_loet(f, stack);
                 break;
             case OP_HALT:
                 err = inst_halt(f, stack);
