@@ -38,9 +38,9 @@ int main(int argc, char *const *argv)
     tokens = lex_from_file(filename);
     program = new_program(tokens);
     if (strcmp(subcommand, "sim") == 0)
-        err = simulate(program);
+        err = run_program(program, 1, 1, 0);
     else if (strcmp(subcommand, "com") == 0)
-        err = compile(program, "output.asm");
+        err = run_program(program, 0, 0, "output.asm");
     else {
         usage(argv[0]);
         printf("ERROR: Invalid subcommand is provided.\n");

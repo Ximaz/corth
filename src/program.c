@@ -6,6 +6,9 @@
 #include "../include/stack.h"
 #include "../include/token.h"
 #include "../include/program.h"
+#include "../include/debugger.h"
+#include "../include/file_handler.h"
+#include "../include/asm_functions.h"
 
 program_t *preprocess_program(program_t *program)
 {
@@ -49,6 +52,74 @@ program_t *new_program(tokens_t *tokens)
     for (; i < tokens->tokens_len; i++)
         program->instructions[i] = tokens->tokens[i]->instruction;
     return preprocess_program(program);
+}
+
+int run_program(program_t *self, int sim, int debug, char const *output)
+{
+    int err = 0;
+    uint64 i = 0;
+    int64 *op = NULL;
+    FILE* f = 0;
+    stack_t *stack = 0;
+
+    assert(COUNT_OPS == SUPPORTED_INSTRUCTIONS);
+    if (!self)
+        return 1;
+    if (sim) {
+        stack = new_stack();
+        if (!stack)
+            return 1;
+    } else {
+        // Output must be specified for compilation.
+        assert(output);
+        f = open_file(output, "w");
+        asm_header(f);
+    }
+    if (sim && debug)
+        debug_stack(stack, 0);
+    for (; i < self->instructions_len; i++) {
+        op = self->instructions[i];
+        switch (op[0]) {
+            case OP_PUSH:
+                inst_push(f, stack, op[2]);
+                break;
+            case OP_PLUS:
+                inst_plus(f, stack);
+                break;
+            case OP_MINUS:
+                inst_minus(f, stack);
+                break;
+            case OP_EQUAL:
+                inst_equal(f, stack);
+                break;
+            case OP_DUMP:
+                inst_dump(f, stack);
+                break;
+            case OP_IF:
+                // NOT IMPLEMENTED YET FOR COMPILATION
+                assert(sim);
+                if (inst_if(f, stack)) {
+                    // `preprocess_program` must be called.
+                    assert(op[2] >= 0);
+                    i = op[2];
+                }
+                break;
+            case OP_END:
+                break;
+            case OP_HALT:
+                err = inst_halt(f, stack);
+                break;
+            default:
+                // Unreachable.
+                assert(0);
+                break;
+        }
+        if (sim && debug)
+            debug_stack(stack, op);
+    }
+    if (!sim)
+        fclose(f);
+    return err;
 }
 
 void destroy_program(program_t *self)
