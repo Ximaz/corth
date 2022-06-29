@@ -10,7 +10,7 @@
 #include "../include/file_handler.h"
 #include "../include/asm_functions.h"
 
-program_t *preprocess_program(program_t *program)
+static program_t *preprocess_program(program_t *program)
 {
     uint64 i = 0;
     int64 *op = 0;
@@ -47,6 +47,24 @@ program_t *preprocess_program(program_t *program)
     }
     destroy_stack(stack);
     return program;
+}
+
+static void show_program(program_t *self)
+{
+    int64 j = 0;
+    uint64 i = 0;
+    int64 *op = 0;
+
+    printf("[\n");
+    for (; i < self->instructions_len; i++) {
+        op = self->instructions[i],
+        printf("    (%s, ", op_codes[op[0]]);
+        for (; j < op[1]; j++)
+            printf("%lld, ", op[j + 2]);
+        printf("),\n");
+        j = 0;
+    }
+    printf("]\n");
 }
 
 program_t *new_program(tokens_t *tokens)
@@ -87,8 +105,10 @@ int run_program(program_t *self, int sim, int debug, char const *output)
         f = open_file(output, "w");
         asm_header(f);
     }
-    if (sim && debug)
+    if (sim && debug) {
+        show_program(self);
         debug_stack(stack, 0);
+    }
     for (; i < self->instructions_len; i++) {
         op = self->instructions[i];
         switch (op[0]) {
@@ -113,14 +133,17 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 // Invalid `IF` end pointer.
                 assert((uint64) op[2] < self->instructions_len);
                 if (inst_if(f, stack, op[2], self->instructions[op[2] - 1][0] == OP_ELSE) && sim)
-                    i = op[2];
+                    i = op[2] - 1;
                 break;
             case OP_ELSE:
                 // `preprocess_program` must be called.
                 assert(op[2] >= 0);
                 // Invalid `ELSE` end pointer.
                 assert((uint64) op[2] < self->instructions_len);
-                inst_else(f, i + 1, op[2]);
+                if (sim)
+                    i = op[2];
+                else
+                    inst_else(f, i + 1, op[2]);
                 break;
             case OP_END:
                 if (!sim)
