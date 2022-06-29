@@ -101,6 +101,8 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 if (inst_if(f, stack)) {
                     // `preprocess_program` must be called.
                     assert(op[2] >= 0);
+                    // Invalid `IF` end pointer.
+                    assert((uint64) op[2] < self->instructions_len);
                     i = op[2];
                 }
                 break;

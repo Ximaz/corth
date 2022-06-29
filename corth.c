@@ -17,6 +17,7 @@ static void usage(char const *binary_name)
 int main(int argc, char *const *argv)
 {
     int err = 0;
+    int use_debugger = 0;
     tokens_t *tokens = 0;
     program_t *program = 0;
     char const *filename = 0;
@@ -36,9 +37,10 @@ int main(int argc, char *const *argv)
     subcommand = argv[1];
     filename = argv[2];
     tokens = lex_from_file(filename);
+    use_debugger = argc > 3 ? strcmp(argv[3], "-d") == 0 : 0;
     program = new_program(tokens);
     if (strcmp(subcommand, "sim") == 0)
-        err = run_program(program, 1, 1, 0);
+        err = run_program(program, 1, use_debugger, 0);
     else if (strcmp(subcommand, "com") == 0)
         err = run_program(program, 0, 0, "output.asm");
     else {
