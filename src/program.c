@@ -23,10 +23,22 @@ program_t *preprocess_program(program_t *program)
             case OP_IF:
                 push_onto_stack(stack, i);
                 break;
+            case OP_ELSE:
+                open_ptr = pop_from(stack);
+                // `else` can only be used in `if` blocks.
+                assert(program->instructions[open_ptr][0] == OP_IF);
+                program->instructions[open_ptr][2] = i + 1;
+                push_onto_stack(stack, i);
+                break;
             case OP_END:
                 open_ptr = pop_from(stack);
-                assert(program->instructions[open_ptr][0] == OP_IF);
-                program->instructions[open_ptr][2] = i;
+                if (program->instructions[open_ptr][0] == OP_IF||
+                    program->instructions[open_ptr][0] == OP_ELSE) {
+                    program->instructions[open_ptr][2] = i;
+                } else {
+                    // Invalid `end` usage.
+                    assert(0);
+                }
                 break;
             default:
                 // Not handling other cases, it's just for blocks.
@@ -62,7 +74,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     FILE* f = 0;
     stack_t *stack = 0;
 
-    assert(COUNT_OPS == SUPPORTED_INSTRUCTIONS);
+    assert(COUNT_OPS == 9);
     if (!self)
         return 1;
     if (sim) {
@@ -100,8 +112,15 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 assert(op[2] >= 0);
                 // Invalid `IF` end pointer.
                 assert((uint64) op[2] < self->instructions_len);
-                if (inst_if(f, stack, op[2]) && sim)
+                if (inst_if(f, stack, op[2], self->instructions[op[2] - 1][0] == OP_ELSE) && sim)
                     i = op[2];
+                break;
+            case OP_ELSE:
+                // `preprocess_program` must be called.
+                assert(op[2] >= 0);
+                // Invalid `ELSE` end pointer.
+                assert((uint64) op[2] < self->instructions_len);
+                inst_else(f, i + 1, op[2]);
                 break;
             case OP_END:
                 if (!sim)

@@ -37,7 +37,7 @@ void debug_stack(stack_t *stack, int64 *op)
             printf(" ");
         printf("%s", n);
         j = 0;
-        for (; j < 12 - n_len / 2 - (n_len == 1); j++)
+            for (; j < 12 - n_len / 2 - (n_len % 2 == 1); j++)
             printf(" ");
         printf("|\n");
         j = 0;

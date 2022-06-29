@@ -28,12 +28,14 @@ static int64 *parse_token(token_t *token)
         return equal();
     if (strcmp(tvalue, ".") == 0)
         return dump();
-    if (strcmp(tvalue, "halt") == 0)
-        return halt();
     if (strcmp(tvalue, "if") == 0)
         return iff();
+    if (strcmp(tvalue, "else") == 0)
+        return elsee();
     if (strcmp(tvalue, "end") == 0)
         return end();
+    if (strcmp(tvalue, "halt") == 0)
+        return halt();
     while (tvalue[i] >= '0' && tvalue[i] <= '9') i++;
     if (tvalue[i] == 0) {
         if (i <= 19) {

@@ -64,6 +64,15 @@ int64 *iff(void)
     return op;
 }
 
+int64 *elsee(void)
+{
+    int64 *op = new_op(OP_ELSE, 1);
+
+    if (op)
+        op[2] = -1; // Invalid pointer to `end`.
+    return op;
+}
+
 int64 *end(void)
 {
     return new_op(OP_END, 0);

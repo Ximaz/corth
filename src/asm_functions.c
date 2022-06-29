@@ -160,7 +160,7 @@ void inst_equal(FILE *f, stack_t *stack)
     exit(1);
 }
 
-int inst_if(FILE *f, stack_t *stack, uint64 end_addr)
+int inst_if(FILE *f, stack_t *stack, uint64 end_addr, int is_else)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -173,8 +173,24 @@ int inst_if(FILE *f, stack_t *stack, uint64 end_addr)
         fprintf(f, "    ;; -- IF --\n");
         fprintf(f, "    pop rax\n");
         fprintf(f, "    test rax, rax\n");
+        fprintf(f, "    ;; -- GOTO %s --\n", is_else ? "ELSE" : "END");
         fprintf(f, "    jz addr_%llu\n", end_addr);
         return 0;
+    }
+    printf("Unreachable.\n");
+    exit(1);
+}
+
+void inst_else(FILE *f, uint64 else_addr, uint64 end_addr)
+{
+    assert(f);
+
+    if (f) {
+        fprintf(f, "    ;; -- GOTO END --\n");
+        fprintf(f, "    jmp addr_%llu\n", end_addr);
+        fprintf(f, ";; -- ELSE --\n");
+        fprintf(f, "addr_%llu:\n", else_addr);
+        return;
     }
     printf("Unreachable.\n");
     exit(1);
@@ -185,6 +201,7 @@ void inst_end(FILE *f, uint64 end_addr)
     assert(f);
 
     if (f) {
+        fprintf(f, ";; -- END --\n");
         fprintf(f, "addr_%llu:\n", end_addr);
         return;
     }

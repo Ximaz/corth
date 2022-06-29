@@ -2,8 +2,6 @@
 #define _CORTH_OPS
 #include "util.h"
 
-static uint64 const SUPPORTED_INSTRUCTIONS = 8;
-
 typedef enum op_code_e
 {
     OP_PUSH,
@@ -13,6 +11,7 @@ typedef enum op_code_e
     OP_HALT,
     OP_EQUAL,
     OP_IF,
+    OP_ELSE,
     OP_END,
     COUNT_OPS,
 } op_code_t;
@@ -25,6 +24,7 @@ static char *const op_codes[] = {
     "OP_HALT",
     "OP_EQUAL",
     "OP_IF",
+    "OP_ELSE",
     "OP_END",
 };
 
@@ -35,6 +35,7 @@ int64 *minus(void);
 int64 *dump(void);
 int64 *equal(void);
 int64 *iff(void);
+int64 *elsee(void);
 int64 *end(void);
 
 #endif
