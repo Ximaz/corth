@@ -1,3 +1,1 @@
-420 69 > if 1 . end 69 420 < if 2 . end 430 420 >= if 3 . end 420 430 <= if 4 . end
-420 69 < if 5 . end 69 420 > if 6 . end 430 420 <= if 7 . end 420 430 >= if 8 . end
-1 halt
+26 while dup 0 > do dup . 1 - end . 0 halt

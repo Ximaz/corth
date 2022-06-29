@@ -42,6 +42,10 @@ static int64 *parse_token(token_t *token)
         return iff();
     if (strcmp(tvalue, "else") == 0)
         return elsee();
+    if (strcmp(tvalue, "while") == 0)
+        return whilee();
+    if (strcmp(tvalue, "do") == 0)
+        return doo();
     if (strcmp(tvalue, "end") == 0)
         return end();
     if (strcmp(tvalue, "halt") == 0)

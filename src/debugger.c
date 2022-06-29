@@ -7,6 +7,7 @@
 
 void debug_stack(stack_t *stack, int64 *op)
 {
+    uint64 padding = 0;
     char n[21];
     uint64 j = 0;
     uint64 n_len = 0;
@@ -28,21 +29,22 @@ void debug_stack(stack_t *stack, int64 *op)
         }
         printf("\n");
     }
-    printf("|------------------------|\n");
+    printf("|--------------------------|\n");
     for (; i >= 0 ; i--) {
         sprintf(n, "%lld", stack->elements[i]);
         n_len = strlen(n);
+        padding = 12;
         printf("|");
-        for (; j < 12 - n_len / 2 - (stack->elements[i] < 0); j++)
+        for (; j < padding - n_len / 2 - (n_len % 2 == 1) + (stack->elements[i] >= 0); j++)
             printf(" ");
         printf("%s", n);
         j = 0;
-            for (; j < 12 - n_len / 2 - (n_len % 2 == 1); j++)
+            for (; j < padding + n_len / 2 + (n_len % 2 == 1 ? 1 : -1); j++)
             printf(" ");
         printf("|\n");
         j = 0;
         if (i > 0)
-            printf("|------------------------|\n");
+            printf("|--------------------------|\n");
     }
-    printf("|------------------------|\n\n");
+    printf("|--------------------------|\n\n");
 }

@@ -16,6 +16,8 @@ typedef enum op_code_e
     OP_LOET,
     OP_IF,
     OP_ELSE,
+    OP_WHILE,
+    OP_DO,
     OP_END,
     OP_HALT,
     COUNT_OPS,
@@ -34,6 +36,8 @@ static char *const op_codes[] = {
     "OP_LOET",
     "OP_IF",
     "OP_ELSE",
+    "OP_WHILE",
+    "OP_DO",
     "OP_END",
     "OP_HALT",
 };
@@ -50,6 +54,8 @@ int64 *goet(void);
 int64 *loet(void);
 int64 *iff(void);
 int64 *elsee(void);
+int64 *whilee(void);
+int64 *doo(void);
 int64 *end(void);
 int64 *halt(void);
 

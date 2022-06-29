@@ -40,7 +40,7 @@ int main(int argc, char *const *argv)
     if (strcmp(subcommand, "sim") == 0)
         err = run_program(program, 1, use_debugger, 0);
     else if (strcmp(subcommand, "com") == 0)
-        err = run_program(program, 0, 0, "output.asm");
+        err = run_program(program, 0, use_debugger, "output.asm");
     else {
         usage(argv[0]);
         printf("ERROR: Invalid subcommand is provided.\n");
