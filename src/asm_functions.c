@@ -149,10 +149,43 @@ void inst_equal(FILE *f, stack_t *stack)
         fprintf(f, "    ;; -- EQUAL --\n");
         fprintf(f, "    pop rax      ; n1\n");
         fprintf(f, "    pop rbx      ; n2\n");
-        fprintf(f, "    cmp rbx, rax\n");
+        fprintf(f, "    sub rbx, rax ; n2 - n1\n");
         fprintf(f, "    xor rax, rax\n");
+        fprintf(f, "    test rbx, rbx\n");
         fprintf(f, "    sete al\n");
         fprintf(f, "    push rax\n");
+        return;
+    }
+    printf("Unreachable.\n");
+    exit(1);
+}
+
+int inst_if(FILE *f, stack_t *stack, uint64 end_addr)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+
+    if (stack) {
+        n1 = pop_from(stack);
+        return (n1 == 0);
+    }
+    else if (f) {
+        fprintf(f, "    ;; -- IF --\n");
+        fprintf(f, "    pop rax\n");
+        fprintf(f, "    test rax, rax\n");
+        fprintf(f, "    jz addr_%llu\n", end_addr);
+        return 0;
+    }
+    printf("Unreachable.\n");
+    exit(1);
+}
+
+void inst_end(FILE *f, uint64 end_addr)
+{
+    assert(f);
+
+    if (f) {
+        fprintf(f, "addr_%llu:\n", end_addr);
         return;
     }
     printf("Unreachable.\n");
@@ -170,23 +203,8 @@ int inst_halt(FILE *f, stack_t *stack)
         fprintf(f, "    mov rax, 60\n");
         fprintf(f, "    pop rdi\n");
         fprintf(f, "    syscall\n");
-        fprintf(f, "    retn\n");
         return 0;
     }
     printf("Unreachable.\n");
     exit(1);
-}
-
-int inst_if(FILE *f, stack_t *stack)
-{
-    assert(f || stack);
-    int64 n1 = 0;
-
-    if (stack) {
-        n1 = pop_from(stack);
-        return (n1 == 0);
-    }
-    else {
-        return 0;
-    }
 }

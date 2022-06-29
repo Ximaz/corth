@@ -96,17 +96,16 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 inst_dump(f, stack);
                 break;
             case OP_IF:
-                // NOT IMPLEMENTED YET FOR COMPILATION
-                assert(sim);
-                if (inst_if(f, stack)) {
-                    // `preprocess_program` must be called.
-                    assert(op[2] >= 0);
-                    // Invalid `IF` end pointer.
-                    assert((uint64) op[2] < self->instructions_len);
+                // `preprocess_program` must be called.
+                assert(op[2] >= 0);
+                // Invalid `IF` end pointer.
+                assert((uint64) op[2] < self->instructions_len);
+                if (inst_if(f, stack, op[2]) && sim)
                     i = op[2];
-                }
                 break;
             case OP_END:
+                if (!sim)
+                    inst_end(f, i);
                 break;
             case OP_HALT:
                 err = inst_halt(f, stack);

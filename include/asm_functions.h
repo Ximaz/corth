@@ -11,7 +11,7 @@ void inst_push(FILE *f, stack_t *stack, int64 n);
 void inst_plus(FILE *f, stack_t *stack);
 void inst_minus(FILE *f, stack_t *stack);
 void inst_equal(FILE *f, stack_t *stack);
+int inst_if(FILE *f, stack_t *stack, uint64 end_addr);
+void inst_end(FILE *f, uint64 end_addr);
 int inst_halt(FILE *f, stack_t *stack);
-int inst_if(FILE *f, stack_t *stack);
-
 #endif
