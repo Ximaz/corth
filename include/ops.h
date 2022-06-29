@@ -1,6 +1,6 @@
 #ifndef _CORTH_OPS
 #define _CORTH_OPS
-#include "util.h"
+#include "types.h"
 
 typedef enum op_code_e
 {
@@ -13,6 +13,7 @@ typedef enum op_code_e
     OP_IF,
     OP_ELSE,
     OP_END,
+    OP_DUP,
     COUNT_OPS,
 } op_code_t;
 
@@ -26,6 +27,7 @@ static char *const op_codes[] = {
     "OP_IF",
     "OP_ELSE",
     "OP_END",
+    "OP_DUP",
 };
 
 int64 *push(int64 n);
@@ -37,5 +39,6 @@ int64 *equal(void);
 int64 *iff(void);
 int64 *elsee(void);
 int64 *end(void);
+int64 *dup(void);
 
 #endif

@@ -1,6 +1,6 @@
 #ifndef _CORTH_PROGRAM
 #define _CORTH_PROGRAM
-#include "util.h"
+#include "types.h"
 #include "token.h"
 #include <stdlib.h>
 

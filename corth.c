@@ -3,8 +3,6 @@
 #include <string.h>
 #include "include/lexer.h"
 #include "include/program.h"
-#include "include/compiler.h"
-#include "include/simulator.h"
 
 static void usage(char const *binary_name)
 {

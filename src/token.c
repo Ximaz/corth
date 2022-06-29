@@ -5,7 +5,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include "../include/ops.h"
-#include "../include/util.h"
+#include "../include/types.h"
 #include "../include/token.h"
 
 static void token_error(char const *error, token_t *token)
@@ -34,6 +34,8 @@ static int64 *parse_token(token_t *token)
         return elsee();
     if (strcmp(tvalue, "end") == 0)
         return end();
+    if (strcmp(tvalue, "dup") == 0)
+        return dup();
     if (strcmp(tvalue, "halt") == 0)
         return halt();
     while (tvalue[i] >= '0' && tvalue[i] <= '9') i++;

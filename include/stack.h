@@ -1,6 +1,6 @@
 #ifndef _CORTH_STACK
 #define _CORTH_STACK
-#include "util.h"
+#include "types.h"
 
 static unsigned int const STACK_SIZE = 4096;
 

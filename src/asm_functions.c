@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "../include/ops.h"
-#include "../include/util.h"
+#include "../include/types.h"
 #include "../include/stack.h"
 #include "../include/asm_functions.h"
 
@@ -203,6 +203,28 @@ void inst_end(FILE *f, uint64 end_addr)
     if (f) {
         fprintf(f, ";; -- END --\n");
         fprintf(f, "addr_%llu:\n", end_addr);
+        return;
+    }
+    printf("Unreachable.\n");
+    exit(1);
+}
+
+void inst_dup(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+
+    if (stack) {
+        n1 = pop_from(stack);
+        push_onto_stack(stack, n1);
+        push_onto_stack(stack, n1);
+        return;
+    }
+    if (f) {
+        fprintf(f, "    ;; -- DUP --\n");
+        fprintf(f, "    pop rax\n");
+        fprintf(f, "    push rax\n");
+        fprintf(f, "    push rax\n");
         return;
     }
     printf("Unreachable.\n");

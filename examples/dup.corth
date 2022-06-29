@@ -1,0 +1,8 @@
+35
+dup .
+dup .
+dup .
+dup .
+dup .
+34 + .
+0 halt

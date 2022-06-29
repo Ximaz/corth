@@ -1,6 +1,6 @@
 #ifndef _CORTH_ASM_FUNCTIONS
 #define _CORTH_ASM_FUNCTIONS
-#include "util.h"
+#include "types.h"
 #include "stack.h"
 #include <stdio.h>
 
@@ -14,5 +14,6 @@ void inst_equal(FILE *f, stack_t *stack);
 int inst_if(FILE *f, stack_t *stack, uint64 end_addr, int is_else);
 void inst_else(FILE *f, uint64 else_addr, uint64 end_addr);
 void inst_end(FILE *f, uint64 end_addr);
+void inst_dup(FILE *f, stack_t *stack);
 int inst_halt(FILE *f, stack_t *stack);
 #endif

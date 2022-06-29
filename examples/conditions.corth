@@ -1,0 +1,10 @@
+35 34 + 69 = if
+    0 if
+        23 .
+    else
+        42 .
+    end
+else
+    420 .
+end
+0 halt

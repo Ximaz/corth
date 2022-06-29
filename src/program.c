@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "../include/ops.h"
-#include "../include/util.h"
+#include "../include/types.h"
 #include "../include/stack.h"
 #include "../include/token.h"
 #include "../include/program.h"
@@ -17,6 +17,7 @@ static program_t *preprocess_program(program_t *program)
     uint64 open_ptr = 0;
     stack_t *stack = new_stack();
 
+    assert(COUNT_OPS == 10);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op[0]) {
@@ -92,7 +93,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     FILE* f = 0;
     stack_t *stack = 0;
 
-    assert(COUNT_OPS == 9);
+    assert(COUNT_OPS == 10);
     if (!self)
         return 1;
     if (sim) {
@@ -148,6 +149,9 @@ int run_program(program_t *self, int sim, int debug, char const *output)
             case OP_END:
                 if (!sim)
                     inst_end(f, i);
+                break;
+            case OP_DUP:
+                inst_dup(f, stack);
                 break;
             case OP_HALT:
                 err = inst_halt(f, stack);

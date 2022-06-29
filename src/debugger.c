@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../include/ops.h"
-#include "../include/util.h"
+#include "../include/types.h"
 #include "../include/stack.h"
 
 void debug_stack(stack_t *stack, int64 *op)

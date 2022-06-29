@@ -77,3 +77,8 @@ int64 *end(void)
 {
     return new_op(OP_END, 0);
 }
+
+int64 *dup(void)
+{
+    return new_op(OP_DUP, 0);
+}
