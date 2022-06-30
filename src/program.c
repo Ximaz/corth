@@ -60,14 +60,13 @@ static program_t *preprocess_program(program_t *program)
                 }
                 if (tmp_op[0] == OP_IF || tmp_op[0] == OP_ELSE) {
                     program->instructions[open_ptr][2] = i;
-                    program->instructions[i][0] = OP_END;
-                    program->instructions[i][2] = i + 1;
+                    program->instructions[i][2] = i;
                 } else if (tmp_op[0] == OP_DO) {
                     program->instructions[i][2] = tmp_op[2]; // store the `while` pointer.
                     program->instructions[open_ptr][2] = i;  // sets the `do` end pointer there.
                 } else {
-                    // ERROR: `end` : block was not opened neither by `if` nor `else` nor `while`.
-                    assert(0);
+                    printf("ERROR: `end` : block was not opened neither by `if` nor `else` nor `while`.\n");
+                    exit(1);
                 }
                 break;
             default:
@@ -199,7 +198,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 // Invalid `end` pointer.
                 assert((uint64) op[2] < self->instructions_len);
                 if (!sim)
-                    inst_end(f, i, op[2]);
+                    inst_end(f, i, op[2] + 1);
                 else
                     i = op[2];
                 break;
