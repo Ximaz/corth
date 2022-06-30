@@ -1,8 +1,8 @@
 #ifndef _CORTH_ASM_FUNCTIONS
 #define _CORTH_ASM_FUNCTIONS
-#include "types.h"
 #include "stack.h"
 #include <stdio.h>
+#include "types.h"
 
 void asm_dump(FILE *f);
 void asm_header(FILE *f);

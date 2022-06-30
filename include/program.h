@@ -1,9 +1,8 @@
 #ifndef _CORTH_PROGRAM
 #define _CORTH_PROGRAM
 #include "ops.h"
-#include "types.h"
 #include "token.h"
-#include <stdlib.h>
+#include "types.h"
 
 typedef struct program_s
 {

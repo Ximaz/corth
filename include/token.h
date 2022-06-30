@@ -1,7 +1,7 @@
 #ifndef _CORTH_TOKEN
 #define _CORTH_TOKEN
-#include "types.h"
 #include "ops.h"
+#include "types.h"
 
 typedef struct token_s
 {
