@@ -97,6 +97,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     uint64 i = 0;
     inst_t *op = 0;
     stack_t *stack = 0;
+    int halt_found = 0;
 
     assert(COUNT_OPS == 17);
     if (!self)
@@ -113,7 +114,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     }
     if (debug && sim)
         debug_stack(stack, 0);
-    for (; i < self->instructions_len; i++) {
+    for (; i < self->instructions_len && !halt_found; i++) {
         op = self->instructions[i];
         if (!sim)
             fprintf(f, "addr_%lld:\n", i);
@@ -193,6 +194,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 break;
             case OP_HALT:
                 err = inst_halt(f, stack);
+                halt_found = 1;
                 break;
             default:
                 // Unreachable.
