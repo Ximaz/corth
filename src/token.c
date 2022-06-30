@@ -14,44 +14,27 @@ static void token_error(char const *error, token_t *token)
     exit(1);
 }
 
-static int64 *parse_token(token_t *token)
+static int64 *find_op(char *sym)
 {
     uint64 i = 0;
+    int64 *op = 0;
+
+    for (; i < COUNT_OPS - 1; i++)
+        if (strcmp(ops_map[i].sym, sym) == 0)
+            return ops_map[i].func();
+    return op;
+}
+
+static int64 *parse_token(token_t *token)
+{
     int64 n = 0;
+    uint64 i = 0;
+    int64 *op = 0;
     char *tvalue = token->token;
 
-    if (strcmp(tvalue, "+") == 0)
-        return plus();
-    if (strcmp(tvalue, "-") == 0)
-        return minus();
-    if (strcmp(tvalue, ".") == 0)
-        return dump();
-    if (strcmp(tvalue, "dup") == 0)
-        return dup();
-    if (strcmp(tvalue, "=") == 0)
-        return equal();
-    if (strcmp(tvalue, "!=") == 0)
-        return diff();
-    if (strcmp(tvalue, ">") == 0)
-        return gt();
-    if (strcmp(tvalue, "<") == 0)
-        return lt();
-    if (strcmp(tvalue, ">=") == 0)
-        return goet();
-    if (strcmp(tvalue, "<=") == 0)
-        return loet();
-    if (strcmp(tvalue, "if") == 0)
-        return iff();
-    if (strcmp(tvalue, "else") == 0)
-        return elsee();
-    if (strcmp(tvalue, "while") == 0)
-        return whilee();
-    if (strcmp(tvalue, "do") == 0)
-        return doo();
-    if (strcmp(tvalue, "end") == 0)
-        return end();
-    if (strcmp(tvalue, "halt") == 0)
-        return halt();
+    op = find_op(tvalue);
+    if (op)
+        return op;
     while (tvalue[i] >= '0' && tvalue[i] <= '9') i++;
     if (tvalue[i] == 0) {
         if (i <= 19) {

@@ -2,6 +2,11 @@
 #define _CORTH_OPS
 #include "types.h"
 
+typedef struct op_s {
+    char const *sym;
+    int64 *(*func)(void);
+} op_t;
+
 typedef enum op_code_e
 {
     OP_PUSH,
@@ -61,5 +66,24 @@ int64 *whilee(void);
 int64 *doo(void);
 int64 *end(void);
 int64 *halt(void);
+
+static op_t const ops_map[] = {
+    { "+", &plus },
+    { "-", &minus },
+    { ".", &dump },
+    { "dup", &dup },
+    { "=", &equal },
+    { "!=", &diff },
+    { ">", &gt },
+    { "<", &lt },
+    { ">=", &goet },
+    { "<=", &loet },
+    { "if", &iff },
+    { "else", &elsee },
+    { "while", &whilee },
+    { "do", &doo },
+    { "end", &end },
+    { "halt", &halt },
+};
 
 #endif
