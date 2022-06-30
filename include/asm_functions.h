@@ -12,6 +12,7 @@ void inst_minus(FILE *f, stack_t *stack);
 void inst_dump(FILE *f, stack_t *stack);
 void inst_dup(FILE *f, stack_t *stack);
 void inst_equal(FILE *f, stack_t *stack);
+void inst_diff(FILE *f, stack_t *stack);
 void inst_gt(FILE *f, stack_t *stack);
 void inst_lt(FILE *f, stack_t *stack);
 void inst_goet(FILE *f, stack_t *stack);

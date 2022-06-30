@@ -10,6 +10,7 @@ typedef enum op_code_e
     OP_DUMP,
     OP_DUP,
     OP_EQUAL,
+    OP_DIFF,
     OP_GT,
     OP_LT,
     OP_GOET,
@@ -30,6 +31,7 @@ static char *const op_codes[] = {
     "OP_DUMP",
     "OP_DUP",
     "OP_EQUAL",
+    "OP_DIFF",
     "OP_GT",
     "OP_LT",
     "OP_GOET",
@@ -48,6 +50,7 @@ int64 *minus(void);
 int64 *dump(void);
 int64 *dup(void);
 int64 *equal(void);
+int64 *diff(void);
 int64 *gt(void);
 int64 *lt(void);
 int64 *goet(void);

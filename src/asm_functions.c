@@ -159,6 +159,29 @@ void inst_equal(FILE *f, stack_t *stack)
     }
 }
 
+void inst_diff(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+    int64 n2 = 0;
+
+    if (stack) {
+        n1 = pop_from(stack);
+        n2 = pop_from(stack);
+        push_onto_stack(stack, n1 != n2);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- DIFF --\n");
+        fprintf(f, "    pop rax      ; n1\n");
+        fprintf(f, "    pop rbx      ; n2\n");
+        fprintf(f, "    sub rbx, rax ; n2 - n1\n");
+        fprintf(f, "    xor rax, rax\n");
+        fprintf(f, "    test rbx, rbx\n");
+        fprintf(f, "    setnz al\n");
+        fprintf(f, "    push rax\n");
+    }
+}
+
 void inst_gt(FILE *f, stack_t *stack)
 {
     assert(f || stack);

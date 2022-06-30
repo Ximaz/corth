@@ -30,6 +30,8 @@ static int64 *parse_token(token_t *token)
         return dup();
     if (strcmp(tvalue, "=") == 0)
         return equal();
+    if (strcmp(tvalue, "!=") == 0)
+        return diff();
     if (strcmp(tvalue, ">") == 0)
         return gt();
     if (strcmp(tvalue, "<") == 0)

@@ -1,10 +1,8 @@
-35 34 + 69 = if
-    0 if
-        23 .
-    else
-        42 .
+50 30 + 0 != if
+    1 if 1 .
+    else 0 .
     end
-else
-    420 .
+else 2 .
 end
+
 0 halt

@@ -26,7 +26,7 @@ static program_t *preprocess_program(program_t *program)
     uint64 open_ptr = 0;
     stack_t *stack = new_stack();
 
-    assert(COUNT_OPS == 16);
+    assert(COUNT_OPS == 17);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op[0]) {
@@ -122,7 +122,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     FILE* f = 0;
     stack_t *stack = 0;
 
-    assert(COUNT_OPS == 16);
+    assert(COUNT_OPS == 17);
     if (!self)
         return 1;
     if (sim) {
@@ -142,7 +142,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     }
     for (; i < self->instructions_len; i++) {
         op = self->instructions[i];
-        if (sim)
+        if (!sim)
             fprintf(f, "addr_%lld:\n", i);
         switch (op[0]) {
             case OP_PUSH:
@@ -156,6 +156,9 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 break;
             case OP_EQUAL:
                 inst_equal(f, stack);
+                break;
+             case OP_DIFF:
+                inst_diff(f, stack);
                 break;
             case OP_DUMP:
                 inst_dump(f, stack);

@@ -55,6 +55,11 @@ int64 *equal(void)
     return new_op(OP_EQUAL, 0);
 }
 
+int64 *diff(void)
+{
+    return new_op(OP_DIFF, 0);
+}
+
 int64 *gt(void)
 {
     return new_op(OP_GT, 0);
