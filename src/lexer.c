@@ -38,7 +38,7 @@ tokens_t *lex_from_line(char const *filename, char *line, uint64 line_i, tokens_
         token = new_token(filename, tvalue, line_i, i);
         i += strlen(tvalue) + 1;
         push_token(tokens, token);
-        tvalue = strtok(NULL, " ");
+        tvalue = strtok(0, " ");
     }
     return tokens;
 }

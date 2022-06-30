@@ -10,36 +10,29 @@
 #include "../include/file_handler.h"
 #include "../include/asm_functions.h"
 
-// static void show_op(int64 *op)
-// {
-//     printf("(%s, %lld", op_codes[op[0]], op[1]);
-//     if (op[1] == 1)
-//         printf(", %lld", op[2]);
-//     printf(")\n");
-// }
-
 static program_t *preprocess_program(program_t *program)
 {
     uint64 i = 0;
-    int64 *op = 0;
-    int64 *tmp_op = 0;
+    inst_t *op = 0;
+    inst_t *tmp_op = 0;
     uint64 open_ptr = 0;
     stack_t *stack = new_stack();
 
     assert(COUNT_OPS == 17);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
-        switch (op[0]) {
+        switch (op->op_code) {
             case OP_IF:
-                program->instructions[i][2] = i;
+                program->instructions[i]->args[0] = i;
                 push_onto_stack(stack, i);
                 break;
             case OP_ELSE:
                 open_ptr = pop_from(stack);
                 // `else` can only be used in `if` blocks.
-                assert(program->instructions[open_ptr][0] == OP_IF);
-                program->instructions[open_ptr][2] = i + 1; // `if` will points to the next instruction
-                program->instructions[i][2] = i;
+                assert(program->instructions[open_ptr]->op_code == OP_IF);
+                // `if` will points to the next instruction
+                program->instructions[open_ptr]->args[0] = i + 1;
+                program->instructions[i]->args[0] = i;
                 push_onto_stack(stack, i);
                 break;
             case OP_WHILE:
@@ -47,23 +40,25 @@ static program_t *preprocess_program(program_t *program)
                 break;
             case OP_DO:
                 open_ptr = pop_from(stack);
-                program->instructions[i][2] = open_ptr;
+                program->instructions[i]->args[0] = open_ptr;
                 push_onto_stack(stack, i);
                 break;
             case OP_END:
                 open_ptr = pop_from(stack);
                 tmp_op = program->instructions[open_ptr];
                 // Invalid `end` usage, no open block encountered.
-                if(tmp_op[2] < 0) {
+                if(tmp_op->args[0] < 0) {
                     printf("ERROR: `end` : No block opened.\n");
                     exit(1);
                 }
-                if (tmp_op[0] == OP_IF || tmp_op[0] == OP_ELSE) {
-                    program->instructions[open_ptr][2] = i;
-                    program->instructions[i][2] = i;
-                } else if (tmp_op[0] == OP_DO) {
-                    program->instructions[i][2] = tmp_op[2]; // store the `while` pointer.
-                    program->instructions[open_ptr][2] = i;  // sets the `do` end pointer there.
+                if (tmp_op->op_code == OP_IF || tmp_op->op_code == OP_ELSE) {
+                    program->instructions[open_ptr]->args[0] = i;
+                    program->instructions[i]->args[0] = i;
+                } else if (tmp_op->op_code == OP_DO) {
+                    // store the `while` pointer.
+                    program->instructions[i]->args[0] = tmp_op->args[0];
+                      // sets the `do` end pointer there.
+                    program->instructions[open_ptr]->args[0] = i;
                 } else {
                     printf("ERROR: `end` : block was not opened neither by `if` nor `else` nor `while`.\n");
                     exit(1);
@@ -78,24 +73,6 @@ static program_t *preprocess_program(program_t *program)
     return program;
 }
 
-static void show_program(program_t *self)
-{
-    int64 j = 0;
-    uint64 i = 0;
-    int64 *op = 0;
-
-    printf("[\n");
-    for (; i < self->instructions_len; i++) {
-        op = self->instructions[i],
-        printf("%lld    (%s, ", i, op_codes[op[0]]);
-        for (; j < op[1]; j++)
-            printf("%lld, ", op[j + 2]);
-        printf("),\n");
-        j = 0;
-    }
-    printf("]\n");
-}
-
 program_t *new_program(tokens_t *tokens)
 {
     size_t i = 0;
@@ -107,7 +84,7 @@ program_t *new_program(tokens_t *tokens)
     if (!program)
         return program;
     program->instructions_len = tokens->tokens_len;
-    program->instructions = (int64 **) calloc(tokens->tokens_len, sizeof(int64 *));
+    program->instructions = (inst_t **) calloc(tokens->tokens_len, sizeof(inst_t *));
     for (; i < tokens->tokens_len; i++)
         program->instructions[i] = tokens->tokens[i]->instruction;
     return preprocess_program(program);
@@ -116,9 +93,9 @@ program_t *new_program(tokens_t *tokens)
 int run_program(program_t *self, int sim, int debug, char const *output)
 {
     int err = 0;
-    uint64 i = 0;
-    int64 *op = NULL;
     FILE* f = 0;
+    uint64 i = 0;
+    inst_t *op = 0;
     stack_t *stack = 0;
 
     assert(COUNT_OPS == 17);
@@ -134,18 +111,15 @@ int run_program(program_t *self, int sim, int debug, char const *output)
         f = open_file(output, "w");
         asm_header(f);
     }
-    if (debug) {
-        show_program(self);
-        if (sim)
-            debug_stack(stack, 0);
-    }
+    if (debug && sim)
+        debug_stack(stack, 0);
     for (; i < self->instructions_len; i++) {
         op = self->instructions[i];
         if (!sim)
             fprintf(f, "addr_%lld:\n", i);
-        switch (op[0]) {
+        switch (op->op_code) {
             case OP_PUSH:
-                inst_push(f, stack, op[2]);
+                inst_push(f, stack, op->args[0]);
                 break;
             case OP_PLUS:
                 inst_plus(f, stack);
@@ -164,21 +138,21 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 break;
             case OP_IF:
                 // `preprocess_program` must be called.
-                assert(op[2] >= 0);
+                assert(op->args[0] >= 0);
                 // Invalid `if` end pointer.
-                assert((uint64) op[2] < self->instructions_len);
-                if (inst_if(f, stack, op[2], self->instructions[op[2] - 1][0] == OP_ELSE) && sim)
-                    i = op[2] - 1;
+                assert((uint64) op->args[0] < self->instructions_len);
+                if (inst_if(f, stack, op->args[0], self->instructions[op->args[0] - 1]->op_code == OP_ELSE) && sim)
+                    i = op->args[0] - 1;
                 break;
             case OP_ELSE:
                 // `preprocess_program` must be called.
-                assert(op[2] >= 0);
+                assert(op->args[0] >= 0);
                 // Invalid `else` end pointer.
-                assert((uint64) op[2] < self->instructions_len);
+                assert((uint64) op->args[0] < self->instructions_len);
                 if (!sim)
-                    inst_else(f, op[2]);
+                    inst_else(f, op->args[0]);
                 else
-                    i = op[2];
+                    i = op->args[0];
                 break;
             case OP_WHILE:
                 if (!sim)
@@ -186,21 +160,21 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 break;
             case OP_DO:
                 // `preprocess_program` must be called.
-                assert(op[2] >= 0);
+                assert(op->args[0] >= 0);
                 // Invalid `end` pointer.
-                assert((uint64) op[2] < self->instructions_len);
-                if (inst_do(f, stack, op[2] + 1) && sim)
-                    i = op[2];
+                assert((uint64) op->args[0] < self->instructions_len);
+                if (inst_do(f, stack, op->args[0] + 1) && sim)
+                    i = op->args[0];
                 break;
             case OP_END:
                 // `preprocess_program` must be called. No address to the next instruction found.
-                assert(op[2] >= 0);
+                assert(op->args[0] >= 0);
                 // Invalid `end` pointer.
-                assert((uint64) op[2] < self->instructions_len);
+                assert((uint64) op->args[0] < self->instructions_len);
                 if (!sim)
-                    inst_end(f, i, op[2] + 1);
+                    inst_end(f, i, op->args[0] + 1);
                 else
-                    i = op[2];
+                    i = op->args[0];
                 break;
             case OP_DUP:
                 inst_dup(f, stack);

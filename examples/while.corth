@@ -1,1 +1,1 @@
-5 while dup 0 > do dup . 1 - end 6969 . halt
+50 while dup 0 > do dup . 1 - end 6969 . 0 halt

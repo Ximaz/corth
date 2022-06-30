@@ -1,5 +1,6 @@
 #ifndef _CORTH_PROGRAM
 #define _CORTH_PROGRAM
+#include "ops.h"
 #include "types.h"
 #include "token.h"
 #include <stdlib.h>
@@ -7,7 +8,7 @@
 typedef struct program_s
 {
     uint64 instructions_len;
-    int64 **instructions;
+    inst_t **instructions;
 } program_t;
 
 program_t *new_program(tokens_t *tokens);

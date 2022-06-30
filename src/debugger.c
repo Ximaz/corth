@@ -5,25 +5,25 @@
 #include "../include/types.h"
 #include "../include/stack.h"
 
-void debug_stack(stack_t *stack, int64 *op)
+void debug_stack(stack_t *stack, inst_t *op)
 {
     uint64 padding = 0;
     char n[21];
     uint64 j = 0;
     uint64 n_len = 0;
-    int64 op_arg_i = 0;
-    int64 i = stack->top - 1;
+    uint64 op_arg_i = 0;
+    long i = stack->top - 1;
 
     if (!op)
         printf("\nPROGRAM BEGINS\n");
     else {
-        printf("\nOP CODE : %s\nARGC : %lld\nARGV : ", op_codes[op[0]], op[1]);
-        if (op[1] == 0)
+        printf("\nOP CODE : %s\nARGC : %llu\nARGV : ", op_codes[op->op_code], op->args_len);
+        if (op->args_len == 0)
             printf("No argument found.");
         else {
-            for (; op_arg_i < op[1]; op_arg_i++) {
-                printf("%lld", op[op_arg_i + 2]);
-                if (op_arg_i < op[1] - 1)
+            for (; op_arg_i < op->args_len; op_arg_i++) {
+                printf("%lld", op->args[op_arg_i]);
+                if (op_arg_i < op->args_len - 1)
                     printf(" ");
             }
         }

@@ -14,7 +14,7 @@ static void token_error(char const *error, token_t *token)
     exit(1);
 }
 
-static int64 *find_op(char *sym)
+static inst_t *find_inst(char *sym)
 {
     uint64 i = 0;
 
@@ -24,20 +24,19 @@ static int64 *find_op(char *sym)
     return 0;
 }
 
-static int64 *parse_token(token_t *token)
+static inst_t *parse_token(token_t *token)
 {
     int64 n = 0;
     uint64 i = 0;
-    int64 *op = 0;
     char *tvalue = token->token;
+    inst_t *inst = find_inst(tvalue);
 
-    op = find_op(tvalue);
-    if (op)
-        return op;
+    if (inst)
+        return inst;
     while (tvalue[i] >= '0' && tvalue[i] <= '9') i++;
     if (tvalue[i] == 0) {
         if (i <= 19) {
-            n = strtoll(tvalue, NULL, 10);
+            n = strtoll(tvalue, 0, 10);
             return push(n);
         }
         if (errno == ERANGE)
@@ -67,7 +66,7 @@ token_t *new_token(char const *filename, char *tvalue, uint64 row, uint64 col)
 
 void destroy_token(token_t *self)
 {
-    if (self != NULL)
+    if (self)
         free(self);
 }
 
@@ -84,7 +83,7 @@ tokens_t *new_tokens(void)
 
 void push_token(tokens_t *self, token_t *token)
 {
-    if (!self->tokens)
+    if (!self || !self->tokens)
         return;
     self->tokens[self->tokens_len++] = token;
     self->tokens = (token_t **) realloc(self->tokens, (self->tokens_len + 1) * sizeof(token_t *));

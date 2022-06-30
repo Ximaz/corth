@@ -1,12 +1,13 @@
 #ifndef _CORTH_TOKEN
 #define _CORTH_TOKEN
 #include "types.h"
+#include "ops.h"
 
 typedef struct token_s
 {
     char const *filename;
     char *token;
-    int64 *instruction;
+    inst_t *instruction;
     uint64 row;
     uint64 col;
 } token_t;

@@ -3,124 +3,118 @@
 #include "../include/ops.h"
 #include "../include/program.h"
 
-/**
- * The OP int64 array will be stored the following way:
- * OP[0]   = (int64)  OP_CODE
- * OP[1]   = (uint64) aguments taken
- * OP[...] = The necessary allocated memory according to OP[1]
- */
-static int64 *new_op(int64 op_code, uint64 argc)
+static inst_t *new_op(op_code_t op_code, uint64 argc)
 {
-    int64 *op;
+    inst_t *inst = (inst_t *) malloc(sizeof(inst_t));
 
-    op = (int64 *) calloc(argc + 2, sizeof(int64));
-    if (!op)
-        return op;
-    op[0] = op_code;
-    op[1] = argc;
-    return op;
+    if (!inst)
+        return inst;
+    inst->op_code = op_code;
+    inst->args_len = argc;
+    inst->args = argc == 0 ? 0 : (int64 *) calloc(argc, sizeof(int64));
+    return inst;
 }
 
-int64 *push(int64 n)
+inst_t *push(int64 n)
 {
-    int64 *op = new_op(OP_PUSH, 1);
+    inst_t *inst = new_op(OP_PUSH, 1);
 
-    if (op)
-        op[2] = n;
-    return op;
+    if (inst)
+        inst->args[0] = n;
+    return inst;
 }
 
-int64 *plus(void)
+inst_t *plus(void)
 {
     return new_op(OP_PLUS, 0);
 }
 
-int64 *minus(void)
+inst_t *minus(void)
 {
     return new_op(OP_MINUS, 0);
 }
 
-int64 *dump(void)
+inst_t *dump(void)
 {
     return new_op(OP_DUMP, 0);
 }
 
-int64 *dup(void)
+inst_t *dup(void)
 {
     return new_op(OP_DUP, 0);
 }
 
-int64 *equal(void)
+inst_t *equal(void)
 {
     return new_op(OP_EQUAL, 0);
 }
 
-int64 *diff(void)
+inst_t *diff(void)
 {
     return new_op(OP_DIFF, 0);
 }
 
-int64 *gt(void)
+inst_t *gt(void)
 {
     return new_op(OP_GT, 0);
 }
 
-int64 *lt(void)
+inst_t *lt(void)
 {
     return new_op(OP_LT, 0);
 }
 
-int64 *goet(void)
+inst_t *goet(void)
 {
     return new_op(OP_GOET, 0);
 }
 
-int64 *loet(void)
+inst_t *loet(void)
 {
     return new_op(OP_LOET, 0);
 }
-int64 *iff(void)
+inst_t *iff(void)
 {
-    int64 *op = new_op(OP_IF, 1);
+    inst_t *inst = new_op(OP_IF, 1);
 
-    if (op)
-        op[2] = -1; // Invalid pointer to `end`.
-    return op;
+    if (inst)
+        inst->args[0] = -1; // Invalid pointer to `end`.
+    return inst;
 }
 
-int64 *elsee(void)
+inst_t *elsee(void)
 {
-    int64 *op = new_op(OP_ELSE, 1);
+    inst_t *inst = new_op(OP_ELSE, 1);
 
-    if (op)
-        op[2] = -1; // Invalid pointer to `end`.
-    return op;
+    if (inst)
+        inst->args[0] = -1; // Invalid pointer to `end`.
+    return inst;
 }
 
-int64 *whilee(void)
+inst_t *whilee(void)
 {
     return new_op(OP_WHILE, 0);
 }
 
-int64 *doo(void)
+inst_t *doo(void)
 {
-    int64 *op = new_op(OP_DO, 1);
+    inst_t *inst = new_op(OP_DO, 1);
 
-    if (op)
-        op[2] = -1; // Invalid pointer to either `end` or `end` + 1.
-    return op;
+    if (inst)
+        inst->args[0] = -1; // Invalid pointer to either `end` or `end` + 1.
+    return inst;
 }
 
-int64 *end(void)
+inst_t *end(void)
 {
-    int64 *op = new_op(OP_END, 1);
+    inst_t *inst = new_op(OP_END, 1);
 
-    if (op)
-        op[2] = -1; // Invalid pointer to `while`.
-    return op;
+    if (inst)
+        inst->args[0] = -1; // Invalid pointer to `while`.
+    return inst;
 }
 
-int64 *halt(void)
+inst_t *halt(void)
 {
     return new_op(OP_HALT, 0);
 }

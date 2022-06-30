@@ -6,7 +6,7 @@ static unsigned int const STACK_SIZE = 4096;
 
 typedef struct stack_s
 {
-    int top;
+    unsigned int top;
     int64 *elements;
 } stack_t;
 
