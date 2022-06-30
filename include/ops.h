@@ -89,4 +89,6 @@ static op_t const ops_map[] = {
     { "halt", &halt },
 };
 
+static char const comment[] = {'/', '/', 0};
+
 #endif
