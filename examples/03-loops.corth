@@ -2,4 +2,3 @@
     dup dump
     1 -
 end
-0 halt
