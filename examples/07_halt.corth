@@ -1,0 +1,5 @@
+0 if
+    0 halt
+else
+    1 halt
+end
