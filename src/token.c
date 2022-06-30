@@ -17,12 +17,11 @@ static void token_error(char const *error, token_t *token)
 static int64 *find_op(char *sym)
 {
     uint64 i = 0;
-    int64 *op = 0;
 
     for (; i < COUNT_OPS - 1; i++)
         if (strcmp(ops_map[i].sym, sym) == 0)
             return ops_map[i].func();
-    return op;
+    return 0;
 }
 
 static int64 *parse_token(token_t *token)

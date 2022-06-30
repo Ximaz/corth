@@ -2,6 +2,9 @@
 #define _CORTH_OPS
 #include "types.h"
 
+// This struct must be used only for tokens
+// which have no params.
+// e.g : can't be used for `push` op.
 typedef struct op_s {
     char const *sym;
     int64 *(*func)(void);
