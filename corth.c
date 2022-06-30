@@ -1,21 +1,3 @@
-/*
-** A `program` is a list of operations called `op`s.
-**
-** `op`s are represented as `token`s.
-**
-** A `token` could be represented the following way :
-** - `filename` : the filename from which the token was found.
-** - `token` : the `token`'s value. (e.g. : `if`, `else`, `end`).
-** - `instruction` : the instruction it should execute (described below).
-** - `row` : the line at which the `token` was found.
-** - `col` : the position on the line at which the token was found.
-**
-** A `instruction` coud be represented the following way :
-** - `op_code` : the op code. (e.g. : `OP_IF`, `OP_ELSE`, `OP_END`).
-** - `args_len` : the number of arguments an instruction can take.
-** - `args` : the list of arguments. (e.g. : the `if` instruction takes a return address parameter.)
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
