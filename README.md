@@ -1,5 +1,5 @@
 # Corth
-It's like [Porth](https://gitlab.com/tsoding/porth), which itself is like Forth, but in C. This project came in my brain when I discovered [Tsoding](https://www.youtube.com/c/TsodingDaily) and it's [Porth videos](https://www.youtube.com/watch?v=8QP2fDBIxjM&list=PLpM-Dvs8t0VbMZA7wW9aR3EtBqe2kinu4) . I have to practice C for school purposes, so why not doing so while creating (rather copying) a programming language ? At least, I can work with files, error handling, debugging, assembly code, etc ... In addition, it will help me to understand how a programming language does work. I share this project to you the same way Tsoding did for me.
+It's like [Porth](https://gitlab.com/tsoding/porth), which itself is like Forth, but in C. This project came in my brain when I discovered [Tsoding](https://www.youtube.com/c/TsodingDaily) and it's [Porth videos](https://www.youtube.com/watch?v=8QP2fDBIxjM&list=PLpM-Dvs8t0VbMZA7wW9aR3EtBqe2kinu4). I have to practice C for school purposes, so why not doing so while creating (rather copying) a programming language ? At least, I can work with files, error handling, debugging, assembly code, etc ... In addition, it will help me to understand how a programming language does work. I share this project to you the same way Tsoding did for me.
 
 ## Roadmap
 Corth is planned to be :
@@ -44,6 +44,9 @@ a = pop(stack)
 b = pop(stack)
 push(stack, b - a)
 ```
+
+### Comparisons
+- `!=`, `=`, `<`, `<=`, `>=` and `>` : pops two elements from the top of the stack, compare them, and push either `0` if the condition is not fulfilled or `1` if it is.
 
 ### Control Flow
 - `if <then-branch> else <else-branch> end` : pops the element at the top of the stack and check if it's value is not `0` to execute the `<then-branch>`, otherwise it runs the `<else-branch>`.
