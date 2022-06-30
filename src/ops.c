@@ -114,6 +114,11 @@ inst_t *end(void)
     return inst;
 }
 
+inst_t *mem(void)
+{
+    return new_op(OP_MEM, 0);
+}
+
 inst_t *halt(void)
 {
     return new_op(OP_HALT, 0);

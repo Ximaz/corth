@@ -17,7 +17,7 @@ void debug_stack(stack_t *stack, inst_t *op)
     if (!op)
         printf("\nPROGRAM BEGINS\n");
     else {
-        printf("\nOP CODE : %s\nARGC : %llu\nARGV : ", op_codes[op->op_code], op->args_len);
+        printf("\nOP CODE : %s\nARGC : %llu\nARGV : ", OP_CODES[op->op_code], op->args_len);
         if (op->args_len == 0)
             printf("No argument found.");
         else {

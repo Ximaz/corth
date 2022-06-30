@@ -20,6 +20,7 @@ typedef enum op_code_e
     OP_WHILE,
     OP_DO,
     OP_END,
+    OP_MEM,
     OP_HALT,
     COUNT_OPS,
 } op_code_t;
@@ -39,7 +40,8 @@ typedef struct op_s {
     inst_t *(*func)(void);
 } op_t;
 
-static char *const op_codes[] = {
+static char *const OP_CODES[] = {
+
     "OP_PUSH",
     "OP_PLUS",
     "OP_MINUS",
@@ -56,6 +58,7 @@ static char *const op_codes[] = {
     "OP_WHILE",
     "OP_DO",
     "OP_END",
+    "OP_MEM",
     "OP_HALT",
 };
 
@@ -75,9 +78,10 @@ inst_t *elsee(void);
 inst_t *whilee(void);
 inst_t *doo(void);
 inst_t *end(void);
+inst_t *mem(void);
 inst_t *halt(void);
 
-static op_t const ops_map[] = {
+static op_t const OPS_MAP[] = {
     { "+", &plus },
     { "-", &minus },
     { ".", &dump },
@@ -93,9 +97,10 @@ static op_t const ops_map[] = {
     { "while", &whilee },
     { "do", &doo },
     { "end", &end },
+    { "mem", &mem },
     { "halt", &halt },
 };
 
-static char const comment[] = {'/', '/', 0};
+static char const COMMENT[] = {'/', '/', 0};
 
 #endif

@@ -34,7 +34,7 @@ tokens_t *lex_from_line(char const *filename, char *line, uint64 line_i, tokens_
     i = trim_line(line, 0);
     line = strip_end_of_line(line);
     tvalue = strtok(line, " ");
-    while (tvalue && strcmp(tvalue, comment) != 0) {
+    while (tvalue && strcmp(tvalue, COMMENT) != 0) {
         token = new_token(filename, tvalue, line_i, i);
         i += strlen(tvalue) + 1;
         push_token(tokens, token);

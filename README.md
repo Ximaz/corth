@@ -15,23 +15,49 @@ Corth is planned to be :
 - [ ] Fix the compiler about printing negative numbers. (Ex : `-10` -> `/0`)
 
 ## Quick Start
+
+### Simulation
+Simulation simply interprets the program.
 ```console
-$ make && ./corth sim <filename> # Simulate the program
-$ make && ./corth com <filename> # Compile the program
-$ ./output                       # Run the program
+$ cat program.corth # Compile the program
+34 35 + .
+$ ./corth sim program.corth
+69
 ```
-Be aware the Makefile compiles to [ELF64](https://fr.wikipedia.org/wiki/Executable_and_Linkable_Format) using [NASM](https://www.nasm.us/) and [ld](https://www.gnu.org/software/binutils/).
 
-If you have other installed, you may change the Makefile to apply them, or install NASM to compile with the default Makefile.
-
-## Documentation
-
-### Arithmetics
-- Any number : pushes the number onto the stack.
+### Compilation
+Compilation generates assembly code which can be compiled using [NASM](https://www.nasm.us/) and linked with [ld](https://www.gnu.org/software/binutils/). So make sure you have them installed.
+```console
+$ cat program.corth # Compile the program
+34 35 + .
+$ ./corth com program.corth
+$ nasm -felf64 output.asm -o output.o
+$ ld output.o -o output
+$ ./output
+69
 ```
-a = 69
+
+## Language Reference
+This is what the language supports so far. **Since the language is a work in progress, some operations are subject to change.**
+
+### Stack manipulation
+- `<integer>` : pushes the integer onto the stack. Right now, it's the only kind of thing that can be parsed by the lexer as number.
+```
+push(stack, <integer>)
+```
+- `dup` : duplicates an element on the top of the stack.
+```
+a = pop(stack)
+push(stack, a)
 push(stack, a)
 ```
+- `.` : pops the element at the top of the stack to print it to the stdout.
+```
+a = pop(stack)
+print(a)
+```
+
+### Arithmetics
 - `+` : sums up two elements at the top of the stack.
 ```
 a = pop(stack)
@@ -51,3 +77,6 @@ push(stack, b - a)
 ### Control Flow
 - `if <then-branch> else <else-branch> end` : pops the element at the top of the stack and check if it's value is not `0` to execute the `<then-branch>`, otherwise it runs the `<else-branch>`.
 - `while <condition> do <body> end` : keeps executing both `<condition>` and `<body>` until `<condition>` produces `0` at the top of the stack. To check the result of the `<condition>`, the last element of the stack is poped.
+
+### Memory
+- `mem` : pushes the address of the beginning of the memory where you can read/write onto the stack.

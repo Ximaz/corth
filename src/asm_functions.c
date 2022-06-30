@@ -48,6 +48,11 @@ void asm_header(FILE *f)
     fprintf(f, "_start:\n");
 }
 
+void asm_footer(FILE *f)
+{
+    fprintf(f, "segment .bss\n");
+    fprintf(f, "%s: resb %llu\n", OPS_MAP[OP_MEM - 1].sym, MEMORY_CAPACITY);
+}
 
 void inst_push(FILE *f, stack_t *stack, int64 n)
 {
@@ -325,11 +330,26 @@ int inst_do(FILE *f, stack_t *stack, uint64 end_addr)
 void inst_end(FILE *f, uint64 end_addr, uint64 next_addr)
 {
     assert(f);
+
     if (end_addr != next_addr)
         fprintf(f, "    jmp addr_%llu\n", next_addr);
     else
         fprintf(f, "    jmp addr_%llu\n", end_addr);
     fprintf(f, ";; -- END --\n");
+}
+
+void inst_mem(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+
+    if (stack) {
+        // NOT IMPLEMENTED YET
+        assert(0);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- MEM --\n");
+        fprintf(f, "    push mem\n");
+    }
 }
 
 int inst_halt(FILE *f, stack_t *stack)

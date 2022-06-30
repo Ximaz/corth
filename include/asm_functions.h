@@ -4,8 +4,11 @@
 #include <stdio.h>
 #include "types.h"
 
+static uint64 const MEMORY_CAPACITY = 4096;
+
 void asm_dump(FILE *f);
 void asm_header(FILE *f);
+void asm_footer(FILE *f);
 void inst_push(FILE *f, stack_t *stack, int64 n);
 void inst_plus(FILE *f, stack_t *stack);
 void inst_minus(FILE *f, stack_t *stack);
@@ -22,5 +25,6 @@ void inst_else(FILE *f, uint64 end_addr);
 void inst_while(FILE *f);
 int inst_do(FILE *f, stack_t *stack, uint64 end_addr);
 void inst_end(FILE *f, uint64 end_addr, uint64 next_addr);
+void inst_mem(FILE *f, stack_t *stack);
 int inst_halt(FILE *f, stack_t *stack);
 #endif

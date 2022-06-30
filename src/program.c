@@ -18,7 +18,7 @@ static program_t *preprocess_program(program_t *program)
     uint64 open_ptr = 0;
     stack_t *stack = new_stack();
 
-    assert(COUNT_OPS == 17);
+    assert(COUNT_OPS == 18);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op->op_code) {
@@ -99,7 +99,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     stack_t *stack = 0;
     int halt_found = 0;
 
-    assert(COUNT_OPS == 17);
+    assert(COUNT_OPS == 18);
     if (!self)
         return 1;
     if (sim) {
@@ -128,14 +128,29 @@ int run_program(program_t *self, int sim, int debug, char const *output)
             case OP_MINUS:
                 inst_minus(f, stack);
                 break;
+            case OP_DUMP:
+                inst_dump(f, stack);
+                break;
+            case OP_DUP:
+                inst_dup(f, stack);
+                break;
             case OP_EQUAL:
                 inst_equal(f, stack);
                 break;
              case OP_DIFF:
                 inst_diff(f, stack);
                 break;
-            case OP_DUMP:
-                inst_dump(f, stack);
+            case OP_GT:
+                inst_gt(f, stack);
+                break;
+            case OP_LT:
+                inst_lt(f, stack);
+                break;
+            case OP_GOET:
+                inst_goet(f, stack);
+                break;
+            case OP_LOET:
+                inst_loet(f, stack);
                 break;
             case OP_IF:
                 // `preprocess_program` must be called.
@@ -177,20 +192,8 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 else
                     i = op->args[0];
                 break;
-            case OP_DUP:
-                inst_dup(f, stack);
-                break;
-            case OP_GT:
-                inst_gt(f, stack);
-                break;
-            case OP_LT:
-                inst_lt(f, stack);
-                break;
-            case OP_GOET:
-                inst_goet(f, stack);
-                break;
-            case OP_LOET:
-                inst_loet(f, stack);
+            case OP_MEM:
+                inst_mem(f, stack);
                 break;
             case OP_HALT:
                 err = inst_halt(f, stack);
@@ -204,8 +207,10 @@ int run_program(program_t *self, int sim, int debug, char const *output)
         if (debug && sim)
             debug_stack(stack, op);
     }
-    if (!sim)
+    if (!sim) {
+        asm_footer(f);
         fclose(f);
+    }
     return err;
 }
 

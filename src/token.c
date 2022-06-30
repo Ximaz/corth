@@ -19,8 +19,8 @@ static inst_t *find_inst(char *sym)
     uint64 i = 0;
 
     for (; i < COUNT_OPS - 1; i++)
-        if (strcmp(ops_map[i].sym, sym) == 0)
-            return ops_map[i].func();
+        if (strcmp(OPS_MAP[i].sym, sym) == 0)
+            return OPS_MAP[i].func();
     return 0;
 }
 
