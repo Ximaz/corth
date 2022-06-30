@@ -142,7 +142,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     }
     for (; i < self->instructions_len; i++) {
         op = self->instructions[i];
-        if (f)
+        if (sim)
             fprintf(f, "addr_%lld:\n", i);
         switch (op[0]) {
             case OP_PUSH:
