@@ -27,7 +27,7 @@ If you have other installed, you may change the Makefile to apply them, or insta
 ## Documentation
 
 ### Arithmetics
-- Any number : push the number onto the stack.
+- Any number : pushes the number onto the stack.
 ```
 a = 69
 push(stack, a)
@@ -46,7 +46,7 @@ push(stack, b - a)
 ```
 
 ### Comparisons
-- `!=`, `=`, `<`, `<=`, `>=` and `>` : pops two elements from the top of the stack, compare them, and push either `0` if the condition is not fulfilled or `1` if it is.
+- `!=`, `=`, `<`, `<=`, `>=` and `>` : pops two elements from the top of the stack, compare them, and pushes either `0` if the condition is not fulfilled or `1` if it is.
 
 ### Control Flow
 - `if <then-branch> else <else-branch> end` : pops the element at the top of the stack and check if it's value is not `0` to execute the `<then-branch>`, otherwise it runs the `<else-branch>`.
