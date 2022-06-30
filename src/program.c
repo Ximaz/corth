@@ -207,6 +207,10 @@ int run_program(program_t *self, int sim, int debug, char const *output)
         if (debug && sim)
             debug_stack(stack, op);
     }
+    if (!halt_found) {
+        inst_push(f, stack, 0);
+        err = inst_halt(f, stack);
+    }
     if (!sim) {
         asm_footer(f);
         fclose(f);

@@ -1,3 +1,0 @@
-34 35 + // Push 69 onto the stack.
-.       // Pop and display the top of the stack.
-0 halt  // Exits the program with exit code 0.

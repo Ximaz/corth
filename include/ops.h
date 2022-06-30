@@ -84,7 +84,7 @@ inst_t *halt(void);
 static op_t const OPS_MAP[] = {
     { "+", &plus },
     { "-", &minus },
-    { ".", &dump },
+    { "dump", &dump },
     { "dup", &dup },
     { "=", &equal },
     { "!=", &diff },

@@ -51,7 +51,7 @@ a = pop(stack)
 push(stack, a)
 push(stack, a)
 ```
-- `.` : pops the element at the top of the stack to print it to the stdout.
+- `dump` : pops the element at the top of the stack to print it to the stdout.
 ```
 a = pop(stack)
 print(a)
