@@ -19,7 +19,7 @@ Corth is planned to be :
 ### Simulation
 Simulation simply interprets the program.
 ```console
-$ cat program.corth # Compile the program
+$ cat program.corth
 34 35 + .
 $ ./corth sim program.corth
 69
@@ -28,7 +28,7 @@ $ ./corth sim program.corth
 ### Compilation
 Compilation generates assembly code which can be compiled using [NASM](https://www.nasm.us/) and linked with [ld](https://www.gnu.org/software/binutils/). So make sure you have them installed.
 ```console
-$ cat program.corth # Compile the program
+$ cat program.corth
 34 35 + .
 $ ./corth com program.corth
 $ nasm -felf64 output.asm -o output.o
