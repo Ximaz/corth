@@ -79,4 +79,4 @@ push(stack, b - a)
 - `while <condition> do <body> end` : keeps executing both `<condition>` and `<body>` until `<condition>` produces `0` at the top of the stack. To check the result of the `<condition>`, the last element of the stack is poped.
 
 ### Memory
-- `mem` : pushes the address of the beginning of the memory where you can read/write onto the stack.
+- `mem` : pushes the address of the beginning of the readable/writable memory onto the stack.
