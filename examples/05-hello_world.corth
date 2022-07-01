@@ -12,4 +12,6 @@ mem dup 72 store
 1 + dup 100 store
 1 + dup 32 store
 1 + dup 33 store
-14 mem 1 1 syscall3
+1 + dup 10 store
+1 +
+mem - mem 1 1 syscall3
