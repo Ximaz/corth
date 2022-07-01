@@ -98,6 +98,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     inst_t *op = 0;
     stack_t *stack = 0;
     int halt_found = 0;
+    unsigned char fake_memory[MEMORY_CAPACITY];
 
     assert(COUNT_OPS == 20);
     if (!self)
@@ -196,10 +197,10 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 inst_mem(f, stack);
                 break;
             case OP_STORE:
-                inst_store(f, stack);
+                inst_store(f, stack, fake_memory);
                 break;
             case OP_LOAD:
-                inst_load(f, stack);
+                inst_load(f, stack, fake_memory);
                 break;
             case OP_HALT:
                 err = inst_halt(f, stack);
@@ -210,8 +211,10 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 assert(0);
                 break;
         }
-        if (debug && sim)
+        if (debug && sim) {
             debug_stack(stack, op);
+            debug_memory(fake_memory, 3);
+        }
     }
     if (!halt_found) {
         inst_push(f, stack, 0);

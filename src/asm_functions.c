@@ -343,8 +343,7 @@ void inst_mem(FILE *f, stack_t *stack)
     assert(f || stack);
 
     if (stack) {
-        // NOT IMPLEMENTED YET
-        assert(0);
+        push_onto_stack(stack, 0);
     }
     if (f) {
         fprintf(f, "    ;; -- MEM --\n");
@@ -352,13 +351,17 @@ void inst_mem(FILE *f, stack_t *stack)
     }
 }
 
-void inst_store(FILE *f, stack_t *stack)
+void inst_store(FILE *f, stack_t *stack, unsigned char *fake_memory)
 {
     assert(f || stack);
+    uint64 byte = 0;
+    uint64 address = 0;
+
 
     if (stack) {
-        // NOT IMPLEMENTED YET
-        assert(0);
+        byte = pop_from(stack);
+        address = pop_from(stack);
+        fake_memory[address] = byte % 0xFF; // Only pushes the lowest bytes of the value, as in assembly.
     }
     if (f) {
         fprintf(f, "    ;; -- STORE --\n");
@@ -368,13 +371,16 @@ void inst_store(FILE *f, stack_t *stack)
     }
 }
 
-void inst_load(FILE *f, stack_t *stack)
+void inst_load(FILE *f, stack_t *stack, unsigned char *fake_memory)
 {
     assert(f || stack);
+    uint64 byte = 0;
+    uint64 address = 0;
 
     if (stack) {
-        // NOT IMPLEMENTED YET
-        assert(0);
+        address = pop_from(stack);
+        byte = fake_memory[address];
+        push_onto_stack(stack, byte);
     }
     if (f) {
         fprintf(f, "    ;; -- LOAD --\n");
