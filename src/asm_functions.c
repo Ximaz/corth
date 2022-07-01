@@ -402,20 +402,20 @@ void inst_syscall(FILE *f, stack_t *stack, unsigned int args_len)
     }
     if (f) {
         fprintf(f, "    ;; -- SYSCALL --\n");
-        if (args_len == 6)
-            fprintf(f, "    pop r9  ; 6th arg of the syscall\n");
-        if (args_len >= 5)
-            fprintf(f, "    pop r8  ; 5th arg of the syscall\n");
-        if (args_len >= 4)
-            fprintf(f, "    pop r10 ; 4th arg of the syscall\n");
-        if (args_len >= 3)
-            fprintf(f, "    pop rdx ; 3rd arg of the syscall\n");
-        if (args_len >= 2)
-            fprintf(f, "    pop rsi ; 2nd arg of the syscall\n");
-        if (args_len >= 1)
-            fprintf(f, "    pop rdi ; 1st arg of the syscall\n");
         fprintf(f, "    pop rax ; the syscall_id\n");
         fprintf(f, "    syscall\n");
+        if (args_len >= 1)
+            fprintf(f, "    pop rdi ; 1st arg of the syscall\n");
+        if (args_len >= 2)
+            fprintf(f, "    pop rsi ; 2nd arg of the syscall\n");
+        if (args_len >= 3)
+            fprintf(f, "    pop rdx ; 3rd arg of the syscall\n");
+        if (args_len >= 4)
+            fprintf(f, "    pop r10 ; 4th arg of the syscall\n");
+        if (args_len >= 5)
+            fprintf(f, "    pop r8  ; 5th arg of the syscall\n");
+        if (args_len == 6)
+            fprintf(f, "    pop r9  ; 6th arg of the syscall\n");
     }
 }
 
