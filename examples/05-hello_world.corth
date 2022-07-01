@@ -1,0 +1,15 @@
+mem 0 + 72 store
+mem 1 + 101 store
+mem 2 + 108 store
+mem 3 + 108 store
+mem 4 + 111 store
+mem 5 + 44 store
+mem 6 + 32 store
+mem 7 + 87 store
+mem 8 + 111 store
+mem 9 + 114 store
+mem 10 + 108 store
+mem 11 + 100 store
+mem 12 + 32 store
+mem 13 + 33 store
+14 mem 1 1 syscall3
