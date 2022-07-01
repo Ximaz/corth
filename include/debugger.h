@@ -4,6 +4,6 @@
 #include "stack.h"
 
 void debug_stack(stack_t *stack, inst_t *op);
-void debug_memory(unsigned char *fake_memory, uint64 limit);
+void debug_memory(unsigned char *fake_mem, uint64 limit);
 
 #endif

@@ -39,7 +39,7 @@ inst_t *dump(void)
     return new_op(OP_DUMP, 0);
 }
 
-inst_t *dup(void)
+inst_t *dupp(void)
 {
     return new_op(OP_DUP, 0);
 }
@@ -162,9 +162,4 @@ inst_t *syscall5(void)
 inst_t *syscall6(void)
 {
     return new_op(OP_SYSCALL6, 0);
-}
-
-inst_t *halt(void)
-{
-    return new_op(OP_HALT, 0);
 }

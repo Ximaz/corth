@@ -50,14 +50,14 @@ void debug_stack(stack_t *stack, inst_t *op)
     printf("|--------------------------|\n\n");
 }
 
-void debug_memory(unsigned char *fake_memory, uint64 limit)
+void debug_memory(unsigned char *fake_mem, uint64 limit)
 {
     uint64 i = 0;
     uint64 range = limit <= MEMORY_CAPACITY ? limit : MEMORY_CAPACITY;
 
     printf("CURRENT MEMORY : [");
     for (; i < range; i++) {
-        printf("%u", fake_memory[i]);
+        printf("%u", fake_mem[i]);
         if (i < range - 1)
             printf(", ");
     }

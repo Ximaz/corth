@@ -30,7 +30,6 @@ typedef enum op_code_e
     OP_SYSCALL4,
     OP_SYSCALL5,
     OP_SYSCALL6,
-    OP_HALT,
     COUNT_OPS,
 } op_code_t;
 
@@ -77,14 +76,13 @@ static char *const OP_CODES[] = {
     "OP_SYSCALL4",
     "OP_SYSCALL5",
     "OP_SYSCALL6",
-    "OP_HALT",
 };
 
 inst_t *push(int64 n);
 inst_t *plus(void);
 inst_t *minus(void);
 inst_t *dump(void);
-inst_t *dup(void);
+inst_t *dupp(void);
 inst_t *equal(void);
 inst_t *diff(void);
 inst_t *gt(void);
@@ -106,13 +104,12 @@ inst_t *syscall3(void);
 inst_t *syscall4(void);
 inst_t *syscall5(void);
 inst_t *syscall6(void);
-inst_t *halt(void);
 
 static op_t const OPS_MAP[] = {
     { "+", &plus },
     { "-", &minus },
     { "dump", &dump },
-    { "dup", &dup },
+    { "dup", &dupp },
     { "=", &equal },
     { "!=", &diff },
     { ">", &gt },
@@ -134,7 +131,6 @@ static op_t const OPS_MAP[] = {
     { "syscall4", &syscall4 },
     { "syscall5", &syscall5 },
     { "syscall6", &syscall6 },
-    { "halt", &halt },
 };
 
 static char const COMMENT[] = {'/', '/', 0};

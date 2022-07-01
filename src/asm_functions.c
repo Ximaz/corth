@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "../include/ops.h"
 #include "../include/types.h"
 #include "../include/stack.h"
@@ -50,6 +51,10 @@ void asm_header(FILE *f)
 
 void asm_footer(FILE *f)
 {
+    fprintf(f, "    ;; -- EXIT --\n");
+    fprintf(f, "    mov rax, 60\n");
+    fprintf(f, "    pop rdi\n");
+    fprintf(f, "    syscall\n");
     fprintf(f, "segment .bss\n");
     fprintf(f, "%s: resb %llu\n", OPS_MAP[OP_MEM - 1].sym, MEMORY_CAPACITY);
 }
@@ -123,7 +128,7 @@ void inst_dump(FILE *f, stack_t *stack)
     }
 }
 
-void inst_dup(FILE *f, stack_t *stack)
+void inst_dupp(FILE *f, stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -351,7 +356,7 @@ void inst_mem(FILE *f, stack_t *stack)
     }
 }
 
-void inst_store(FILE *f, stack_t *stack, unsigned char *fake_memory)
+void inst_store(FILE *f, stack_t *stack, unsigned char *fake_mem)
 {
     assert(f || stack);
     uint64 byte = 0;
@@ -361,7 +366,7 @@ void inst_store(FILE *f, stack_t *stack, unsigned char *fake_memory)
     if (stack) {
         byte = pop_from(stack);
         address = pop_from(stack);
-        fake_memory[address] = byte % 0xFF; // Only pushes the lowest bytes of the value, as in assembly.
+        fake_mem[address] = byte % 0xFF; // Only pushes the lowest bytes of the value, as in assembly.
     }
     if (f) {
         fprintf(f, "    ;; -- STORE --\n");
@@ -371,7 +376,7 @@ void inst_store(FILE *f, stack_t *stack, unsigned char *fake_memory)
     }
 }
 
-void inst_load(FILE *f, stack_t *stack, unsigned char *fake_memory)
+void inst_load(FILE *f, stack_t *stack, unsigned char *fake_mem)
 {
     assert(f || stack);
     uint64 byte = 0;
@@ -379,7 +384,7 @@ void inst_load(FILE *f, stack_t *stack, unsigned char *fake_memory)
 
     if (stack) {
         address = pop_from(stack);
-        byte = fake_memory[address];
+        byte = fake_mem[address];
         push_onto_stack(stack, byte);
     }
     if (f) {
@@ -391,13 +396,40 @@ void inst_load(FILE *f, stack_t *stack, unsigned char *fake_memory)
     }
 }
 
-void inst_syscall(FILE *f, stack_t *stack, unsigned int args_len)
+int inst_syscall(FILE *f, stack_t *stack, unsigned char *fake_mem, unsigned int args_len)
 {
     assert(f || stack);
     assert(args_len <= 6);
+    int64 rax = 0;
+    int64 rdi = 0;
+    int64 rsi = 0;
+    int64 rdx = 0;
+    // int64 r8 = 0; // Unused yet.
+    // int64 r10 = 0; // Unused yet.
+    // int64 r9 = 0; // Unused yet.
 
     if (stack) {
-        // NOT IMPLEMENTED YET.
+        if (args_len == 2) {
+            rax = pop_from(stack);
+            rdi = pop_from(stack);
+            if (rax == 60) {
+                return rdi % 256;
+            }
+        }
+        if (args_len == 3) {
+            rax = pop_from(stack);
+            rdi = pop_from(stack);
+            rsi = pop_from(stack);
+            rdx = pop_from(stack);
+            if (rax == 1) {
+                write(rdi, &fake_mem[rsi], rdx);
+                return 256;
+            } else {
+                // NOT IMPLEMENTED YET !
+                assert(0);
+            }
+        }
+        // NOT IMPLEMENTED YET !
         assert(0);
     }
     if (f) {
@@ -417,19 +449,5 @@ void inst_syscall(FILE *f, stack_t *stack, unsigned int args_len)
         if (args_len == 6)
             fprintf(f, "    pop r9  ; 6th arg of the syscall\n");
     }
-}
-
-int inst_halt(FILE *f, stack_t *stack)
-{
-    assert(f || stack);
-
-    if (stack)
-        return pop_from(stack) % 256;
-    if (f) {
-        fprintf(f, "    ;; -- HALT --\n");
-        fprintf(f, "    mov rax, 60\n");
-        fprintf(f, "    pop rdi\n");
-        fprintf(f, "    syscall\n");
-    }
-    return 0;
+    return 256;
 }

@@ -18,7 +18,7 @@ static program_t *preprocess_program(program_t *program)
     uint64 open_ptr = 0;
     stack_t *stack = new_stack();
 
-    assert(COUNT_OPS == 27);
+    assert(COUNT_OPS == 26);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op->op_code) {
@@ -97,17 +97,18 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     uint64 i = 0;
     inst_t *op = 0;
     stack_t *stack = 0;
-    int halt_found = 0;
-    unsigned char fake_memory[MEMORY_CAPACITY];
+    int exit_found = 0;
+    unsigned char fake_mem[MEMORY_CAPACITY];
 
-    assert(COUNT_OPS == 27);
+    assert(COUNT_OPS == 26);
     if (!self)
         return 1;
     if (sim) {
         stack = new_stack();
         if (!stack)
             return 1;
-    } else {
+    }
+    else {
         // Output must be specified for compilation.
         assert(output);
         f = open_file(output, "w");
@@ -115,7 +116,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     }
     if (debug && sim)
         debug_stack(stack, 0);
-    for (; i < self->instructions_len && !halt_found; i++) {
+    for (; i < self->instructions_len && !exit_found; i++) {
         op = self->instructions[i];
         if (!sim)
             fprintf(f, "addr_%lld:\n", i);
@@ -133,7 +134,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 inst_dump(f, stack);
                 break;
             case OP_DUP:
-                inst_dup(f, stack);
+                inst_dupp(f, stack);
                 break;
             case OP_EQUAL:
                 inst_equal(f, stack);
@@ -197,35 +198,33 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 inst_mem(f, stack);
                 break;
             case OP_STORE:
-                inst_store(f, stack, fake_memory);
+                inst_store(f, stack, fake_mem);
                 break;
             case OP_LOAD:
-                inst_load(f, stack, fake_memory);
+                inst_load(f, stack, fake_mem);
                 break;
             case OP_SYSCALL0:
-                inst_syscall(f, stack, 0);
+                inst_syscall(f, stack, fake_mem, 0);
                 break;
             case OP_SYSCALL1:
-                inst_syscall(f, stack, 1);
+                inst_syscall(f, stack, fake_mem, 1);
                 break;
             case OP_SYSCALL2:
-                inst_syscall(f, stack, 2);
+                err = inst_syscall(f, stack, fake_mem, 2);
+                if (err < 256)      // Else it's not the exit syscall.
+                    exit_found = 1;
                 break;
             case OP_SYSCALL3:
-                inst_syscall(f, stack, 3);
+                inst_syscall(f, stack, fake_mem, 3);
                 break;
             case OP_SYSCALL4:
-                inst_syscall(f, stack, 4);
+                inst_syscall(f, stack, fake_mem, 4);
                 break;
             case OP_SYSCALL5:
-                inst_syscall(f, stack, 5);
+                inst_syscall(f, stack, fake_mem, 5);
                 break;
             case OP_SYSCALL6:
-                inst_syscall(f, stack, 6);
-                break;
-            case OP_HALT:
-                err = inst_halt(f, stack);
-                halt_found = 1;
+                inst_syscall(f, stack, fake_mem, 6);
                 break;
             default:
                 // Unreachable.
@@ -234,12 +233,8 @@ int run_program(program_t *self, int sim, int debug, char const *output)
         }
         if (debug && sim) {
             debug_stack(stack, op);
-            debug_memory(fake_memory, 3);
+            debug_memory(fake_mem, 3);
         }
-    }
-    if (!halt_found) {
-        inst_push(f, stack, 0);
-        err = inst_halt(f, stack);
     }
     if (!sim) {
         asm_footer(f);

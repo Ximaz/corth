@@ -77,7 +77,7 @@ push(stack, b - a)
 ### Control Flow
 - `if <then-branch> else <else-branch> end` : pops the element at the top of the stack and check if it's value is not `0` to execute the `<then-branch>`, otherwise it runs the `<else-branch>`.
 - `while <condition> do <body> end` : keeps executing both `<condition>` and `<body>` until `<condition>` produces `0` at the top of the stack. To check the result of the `<condition>`, the last element of the stack is poped.
-- `halt` : pops the elements at the top of the stack as an [exit status](https://en.wikipedia.org/wiki/Exit_status), then quits the program.
+- `halt` : ~~pops the elements at the top of the stack as an [exit status](https://en.wikipedia.org/wiki/Exit_status), then quits the program.~~ **Replaced by the `syscall` possibilities. See `### System`.**
 
 ### Memory
 - `mem` : pushes the address of the beginning of the readable/writable memory onto the stack.
