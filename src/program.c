@@ -18,7 +18,7 @@ static program_t *preprocess_program(program_t *program)
     uint64 open_ptr = 0;
     stack_t *stack = new_stack();
 
-    assert(COUNT_OPS == 18);
+    assert(COUNT_OPS == 20);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op->op_code) {
@@ -99,7 +99,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     stack_t *stack = 0;
     int halt_found = 0;
 
-    assert(COUNT_OPS == 18);
+    assert(COUNT_OPS == 20);
     if (!self)
         return 1;
     if (sim) {
@@ -194,6 +194,12 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 break;
             case OP_MEM:
                 inst_mem(f, stack);
+                break;
+            case OP_STORE:
+                inst_store(f, stack);
+                break;
+            case OP_LOAD:
+                inst_load(f, stack);
                 break;
             case OP_HALT:
                 err = inst_halt(f, stack);

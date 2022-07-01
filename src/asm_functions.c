@@ -266,8 +266,8 @@ void inst_loet(FILE *f, stack_t *stack)
     }
     if (f) {
         fprintf(f, "    ;; -- LESS OR EQUAL THAN --\n");
-        fprintf(f, "    pop rcx      ; n1\n");
-        fprintf(f, "    pop rbx      ; n2\n");
+        fprintf(f, "    pop rcx ; n1\n");
+        fprintf(f, "    pop rbx ; n2\n");
         fprintf(f, "    xor rax, rax\n");
         fprintf(f, "    cmp rbx, rcx\n");
         fprintf(f, "    setbe al\n");
@@ -352,6 +352,38 @@ void inst_mem(FILE *f, stack_t *stack)
     }
 }
 
+void inst_store(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+
+    if (stack) {
+        // NOT IMPLEMENTED YET
+        assert(0);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- STORE --\n");
+        fprintf(f, "    pop rbx ; contains the byte to store\n");
+        fprintf(f, "    pop rax ; contains the mem pointer\n");
+        fprintf(f, "    mov byte [rax], bl\n");
+    }
+}
+
+void inst_load(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+
+    if (stack) {
+        // NOT IMPLEMENTED YET
+        assert(0);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- LOAD --\n");
+        fprintf(f, "    pop rbx ; contains the mem pointer\n");
+        fprintf(f, "    xor rax, rax\n");
+        fprintf(f, "    mov al, byte [rbx]\n");
+        fprintf(f, "    push rax\n");
+    }
+}
 int inst_halt(FILE *f, stack_t *stack)
 {
     assert(f || stack);

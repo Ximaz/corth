@@ -25,6 +25,10 @@ $(OBJ): src/libcorth.a
 src/libcorth.a:
 	make -C src/
 
+asm_it:
+	nasm -felf64 -F dwarf -O0 output.asm -o output.o
+	ld output.o -o output -O0
+
 clean:
 	rm -f $(OBJ) $(GDB_TMP_FILES) $(ASM_OUTPUT)
 	make -C src/ clean

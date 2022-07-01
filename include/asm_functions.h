@@ -26,5 +26,7 @@ void inst_while(FILE *f);
 int inst_do(FILE *f, stack_t *stack, uint64 end_addr);
 void inst_end(FILE *f, uint64 end_addr, uint64 next_addr);
 void inst_mem(FILE *f, stack_t *stack);
+void inst_store(FILE *f, stack_t *stack);
+void inst_load(FILE *f, stack_t *stack);
 int inst_halt(FILE *f, stack_t *stack);
 #endif

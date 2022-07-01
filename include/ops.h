@@ -21,6 +21,8 @@ typedef enum op_code_e
     OP_DO,
     OP_END,
     OP_MEM,
+    OP_STORE,
+    OP_LOAD,
     OP_HALT,
     COUNT_OPS,
 } op_code_t;
@@ -59,6 +61,8 @@ static char *const OP_CODES[] = {
     "OP_DO",
     "OP_END",
     "OP_MEM",
+    "OP_STORE",
+    "OP_LOAD",
     "OP_HALT",
 };
 
@@ -79,6 +83,8 @@ inst_t *whilee(void);
 inst_t *doo(void);
 inst_t *end(void);
 inst_t *mem(void);
+inst_t *store(void);
+inst_t *load(void);
 inst_t *halt(void);
 
 static op_t const OPS_MAP[] = {
@@ -98,6 +104,8 @@ static op_t const OPS_MAP[] = {
     { "do", &doo },
     { "end", &end },
     { "mem", &mem },
+    { "store", &store },
+    { "load", &load },
     { "halt", &halt },
 };
 
