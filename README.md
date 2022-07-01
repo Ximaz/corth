@@ -98,7 +98,7 @@ push(stack, byte)
 ```
 
 ### System
-- `syscallN` : perform a syscall (according to [this convention](https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md)) which requires `N` arguemnts such as `0 <= N <= 6`.
+- `syscallN` : perform a syscall (according to [this convention](https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md)) which requires `N` arguments such as `0 <= N <= 6`.
 ```
 rax = pop(stack) # The syscall ID, must be here anyway.
 rdi = pop(stack) # if N is enough high.
