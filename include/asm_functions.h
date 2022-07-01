@@ -28,5 +28,6 @@ void inst_end(FILE *f, uint64 end_addr, uint64 next_addr);
 void inst_mem(FILE *f, stack_t *stack);
 void inst_store(FILE *f, stack_t *stack, unsigned char *fake_memory);
 void inst_load(FILE *f, stack_t *stack, unsigned char *fake_memory);
+void inst_syscall(FILE *f, stack_t *stack, unsigned int args_len);
 int inst_halt(FILE *f, stack_t *stack);
 #endif

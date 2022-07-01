@@ -80,8 +80,8 @@ void inst_plus(FILE *f, stack_t *stack)
     }
     if (f) {
         fprintf(f, "    ;; -- PLUS --\n");
-        fprintf(f, "    pop rax      ; n1\n");
-        fprintf(f, "    pop rbx      ; n2\n");
+        fprintf(f, "    pop rax ; n1\n");
+        fprintf(f, "    pop rbx ; n2\n");
         fprintf(f, "    add rax, rbx\n");
         fprintf(f, "    push rax\n");
     }
@@ -100,8 +100,8 @@ void inst_minus(FILE *f, stack_t *stack)
     }
     if (f) {
         fprintf(f, "    ;; -- MINUS --\n");
-        fprintf(f, "    pop rax      ; n1\n");
-        fprintf(f, "    pop rbx      ; n2\n");
+        fprintf(f, "    pop rax ; n1\n");
+        fprintf(f, "    pop rbx ; n2\n");
         fprintf(f, "    sub rbx, rax\n");
         fprintf(f, "    push rbx\n");
     }
@@ -200,8 +200,8 @@ void inst_gt(FILE *f, stack_t *stack)
     }
     if (f) {
         fprintf(f, "    ;; -- GREATER THAN --\n");
-        fprintf(f, "    pop rcx      ; n1\n");
-        fprintf(f, "    pop rbx      ; n2\n");
+        fprintf(f, "    pop rcx ; n1\n");
+        fprintf(f, "    pop rbx ; n2\n");
         fprintf(f, "    xor rax, rax\n");
         fprintf(f, "    cmp rbx, rcx\n");
         fprintf(f, "    seta al\n");
@@ -222,8 +222,8 @@ void inst_lt(FILE *f, stack_t *stack)
     }
     if (f) {
         fprintf(f, "    ;; -- LESS THAN --\n");
-        fprintf(f, "    pop rcx      ; n1\n");
-        fprintf(f, "    pop rbx      ; n2\n");
+        fprintf(f, "    pop rcx ; n1\n");
+        fprintf(f, "    pop rbx ; n2\n");
         fprintf(f, "    xor rax, rax\n");
         fprintf(f, "    cmp rbx, rcx\n");
         fprintf(f, "    setb al\n");
@@ -244,8 +244,8 @@ void inst_goet(FILE *f, stack_t *stack)
     }
     if (f) {
         fprintf(f, "    ;; -- GREATER OR EQUAL THAN --\n");
-        fprintf(f, "    pop rcx      ; n2\n");
-        fprintf(f, "    pop rbx      ; n1\n");
+        fprintf(f, "    pop rcx ; n2\n");
+        fprintf(f, "    pop rbx ; n1\n");
         fprintf(f, "    xor rax, rax\n");
         fprintf(f, "    cmp rbx, rcx\n");
         fprintf(f, "    setae al\n");
@@ -390,6 +390,35 @@ void inst_load(FILE *f, stack_t *stack, unsigned char *fake_memory)
         fprintf(f, "    push rax\n");
     }
 }
+
+void inst_syscall(FILE *f, stack_t *stack, unsigned int args_len)
+{
+    assert(f || stack);
+    assert(args_len <= 6);
+
+    if (stack) {
+        // NOT IMPLEMENTED YET.
+        assert(0);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- SYSCALL --\n");
+        if (args_len == 6)
+            fprintf(f, "    pop r9  ; 6th arg of the syscall\n");
+        if (args_len >= 5)
+            fprintf(f, "    pop r8  ; 5th arg of the syscall\n");
+        if (args_len >= 4)
+            fprintf(f, "    pop r10 ; 4th arg of the syscall\n");
+        if (args_len >= 3)
+            fprintf(f, "    pop rdx ; 3rd arg of the syscall\n");
+        if (args_len >= 2)
+            fprintf(f, "    pop rsi ; 2nd arg of the syscall\n");
+        if (args_len >= 1)
+            fprintf(f, "    pop rdi ; 1st arg of the syscall\n");
+        fprintf(f, "    pop rax ; the syscall_id\n");
+        fprintf(f, "    syscall\n");
+    }
+}
+
 int inst_halt(FILE *f, stack_t *stack)
 {
     assert(f || stack);

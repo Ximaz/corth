@@ -129,6 +129,41 @@ inst_t *load(void)
     return new_op(OP_LOAD, 0);
 }
 
+inst_t *syscall0(void)
+{
+    return new_op(OP_SYSCALL0, 0);
+}
+
+inst_t *syscall1(void)
+{
+    return new_op(OP_SYSCALL1, 0);
+}
+
+inst_t *syscall2(void)
+{
+    return new_op(OP_SYSCALL2, 0);
+}
+
+inst_t *syscall3(void)
+{
+    return new_op(OP_SYSCALL3, 0);
+}
+
+inst_t *syscall4(void)
+{
+    return new_op(OP_SYSCALL4, 0);
+}
+
+inst_t *syscall5(void)
+{
+    return new_op(OP_SYSCALL5, 0);
+}
+
+inst_t *syscall6(void)
+{
+    return new_op(OP_SYSCALL6, 0);
+}
+
 inst_t *halt(void)
 {
     return new_op(OP_HALT, 0);

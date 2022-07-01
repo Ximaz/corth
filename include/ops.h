@@ -23,6 +23,13 @@ typedef enum op_code_e
     OP_MEM,
     OP_STORE,
     OP_LOAD,
+    OP_SYSCALL0,
+    OP_SYSCALL1,
+    OP_SYSCALL2,
+    OP_SYSCALL3,
+    OP_SYSCALL4,
+    OP_SYSCALL5,
+    OP_SYSCALL6,
     OP_HALT,
     COUNT_OPS,
 } op_code_t;
@@ -63,6 +70,13 @@ static char *const OP_CODES[] = {
     "OP_MEM",
     "OP_STORE",
     "OP_LOAD",
+    "OP_SYSCALL0",
+    "OP_SYSCALL1",
+    "OP_SYSCALL2",
+    "OP_SYSCALL3",
+    "OP_SYSCALL4",
+    "OP_SYSCALL5",
+    "OP_SYSCALL6",
     "OP_HALT",
 };
 
@@ -85,6 +99,13 @@ inst_t *end(void);
 inst_t *mem(void);
 inst_t *store(void);
 inst_t *load(void);
+inst_t *syscall0(void);
+inst_t *syscall1(void);
+inst_t *syscall2(void);
+inst_t *syscall3(void);
+inst_t *syscall4(void);
+inst_t *syscall5(void);
+inst_t *syscall6(void);
 inst_t *halt(void);
 
 static op_t const OPS_MAP[] = {
@@ -106,6 +127,13 @@ static op_t const OPS_MAP[] = {
     { "mem", &mem },
     { "store", &store },
     { "load", &load },
+    { "syscall0", &syscall0 },
+    { "syscall1", &syscall1 },
+    { "syscall2", &syscall2 },
+    { "syscall3", &syscall3 },
+    { "syscall4", &syscall4 },
+    { "syscall5", &syscall5 },
+    { "syscall6", &syscall6 },
     { "halt", &halt },
 };
 

@@ -96,3 +96,25 @@ address = pop(stack)
 byte = laod(address)
 push(stack, byte)
 ```
+
+### System
+- `syscallN` : perform a syscall (according to [this convention](https://chromium.googlesource.com/chromiumos/docs/+/master/constants/syscalls.md)) which requires `N` arguemnts such as `0 <= N <= 6`.
+```
+r9 = pop(stack) # if N is enough high.
+r8 = pop(stack) # if N is enough high.
+r10 = pop(stack) # if N is enough high.
+rdx = pop(stack) # if N is enough high.
+rsi = pop(stack) # if N is enough high.
+rdi = pop(stack) # if N is enough high.
+rax = pop(stack) # The syscall ID, must be here anyway.
+syscall
+```
+
+Example : show the 3 first character of the `mem` into the stdout.
+```
+1        // rax
+1        // rdi
+mem      // rsi
+3        // rdx
+syscall3 // This syscall has 3 arguments.
+```

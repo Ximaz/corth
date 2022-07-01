@@ -18,7 +18,7 @@ static program_t *preprocess_program(program_t *program)
     uint64 open_ptr = 0;
     stack_t *stack = new_stack();
 
-    assert(COUNT_OPS == 20);
+    assert(COUNT_OPS == 27);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op->op_code) {
@@ -100,7 +100,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
     int halt_found = 0;
     unsigned char fake_memory[MEMORY_CAPACITY];
 
-    assert(COUNT_OPS == 20);
+    assert(COUNT_OPS == 27);
     if (!self)
         return 1;
     if (sim) {
@@ -201,6 +201,27 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 break;
             case OP_LOAD:
                 inst_load(f, stack, fake_memory);
+                break;
+            case OP_SYSCALL0:
+                inst_syscall(f, stack, 0);
+                break;
+            case OP_SYSCALL1:
+                inst_syscall(f, stack, 1);
+                break;
+            case OP_SYSCALL2:
+                inst_syscall(f, stack, 2);
+                break;
+            case OP_SYSCALL3:
+                inst_syscall(f, stack, 3);
+                break;
+            case OP_SYSCALL4:
+                inst_syscall(f, stack, 4);
+                break;
+            case OP_SYSCALL5:
+                inst_syscall(f, stack, 5);
+                break;
+            case OP_SYSCALL6:
+                inst_syscall(f, stack, 6);
                 break;
             case OP_HALT:
                 err = inst_halt(f, stack);
