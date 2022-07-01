@@ -81,5 +81,18 @@ push(stack, b - a)
 
 ### Memory
 - `mem` : pushes the address of the beginning of the readable/writable memory onto the stack.
-- `store` : pops two elements at the top of the stack which represent the byte to store (first pop) and then the `mem` address to which the byte will be stored (second pop).
-- `load` : pops the element at the top of the stack that contains the `mem` address to which the byte should be extracted from, and pushes it onto the stack.
+```
+push(mem_address)
+```
+- `store` : stores a given byte to the given `mem` address.
+```
+byte = pop(stack)
+address = pop(stack)
+store(address, byte)
+```
+- `load` : loads a byte from a given `mem` address.
+```
+address = pop(stack)
+byte = laod(address)
+push(stack, byte)
+```
