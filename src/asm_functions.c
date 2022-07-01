@@ -435,7 +435,6 @@ int inst_syscall(FILE *f, stack_t *stack, unsigned char *fake_mem, unsigned int 
     if (f) {
         fprintf(f, "    ;; -- SYSCALL --\n");
         fprintf(f, "    pop rax ; the syscall_id\n");
-        fprintf(f, "    syscall\n");
         if (args_len >= 1)
             fprintf(f, "    pop rdi ; 1st arg of the syscall\n");
         if (args_len >= 2)
@@ -448,6 +447,7 @@ int inst_syscall(FILE *f, stack_t *stack, unsigned char *fake_mem, unsigned int 
             fprintf(f, "    pop r8  ; 5th arg of the syscall\n");
         if (args_len == 6)
             fprintf(f, "    pop r9  ; 6th arg of the syscall\n");
+        fprintf(f, "    syscall\n");
     }
     return 256;
 }
