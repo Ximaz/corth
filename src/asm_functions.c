@@ -53,7 +53,7 @@ void asm_footer(FILE *f)
 {
     fprintf(f, "    ;; -- EXIT --\n");
     fprintf(f, "    mov rax, 60\n");
-    fprintf(f, "    pop rdi\n");
+    fprintf(f, "    xor rdi, rdi\n");
     fprintf(f, "    syscall\n");
     fprintf(f, "segment .bss\n");
     fprintf(f, "%s: resb %llu\n", OPS_MAP[OP_MEM - 1].sym, MEMORY_CAPACITY);
