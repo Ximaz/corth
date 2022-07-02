@@ -57,7 +57,7 @@ a = pop(stack)
 print(a)
 ```
 
-### Arithmetics
+### Arithmetics ([Example file](https://github.com/Ximaz/corth/blob/main/examples/arithmetics.corth))
 - `+` : sums up two elements at the top of the stack.
 ```
 a = pop(stack)
@@ -71,7 +71,7 @@ b = pop(stack)
 push(stack, b - a)
 ```
 
-### Bitwise
+### Bitwise ([Example file](https://github.com/Ximaz/corth/blob/main/examples/bitwise.corth))
 - `shr`
 ```
 shifter = pop(stack)
@@ -102,11 +102,11 @@ push(a & b)
 - `!=`, `=`, `<`, `<=`, `>=` and `>` : pops two elements from the top of the stack, compares them, and pushes either `0` if the condition is not fulfilled or `1` if it is.
 
 ### Control Flow
-- `if <then-branch> else <else-branch> end` : pops the element at the top of the stack and check if it's value is not `0` to execute the `<then-branch>`, otherwise it runs the `<else-branch>`.
-- `while <condition> do <body> end` : keeps executing both `<condition>` and `<body>` until `<condition>` produces `0` at the top of the stack. To check the result of the `<condition>`, the last element of the stack is poped.
+- `if <then-branch> else <else-branch> end` : pops the element at the top of the stack and check if it's value is not `0` to execute the `<then-branch>`, otherwise it runs the `<else-branch>`. ([Example file](https://github.com/Ximaz/corth/blob/main/examples/conditions.corth))
+- `while <condition> do <body> end` : keeps executing both `<condition>` and `<body>` until `<condition>` produces `0` at the top of the stack. To check the result of the `<condition>`, the last element of the stack is poped. ([Example file](https://github.com/Ximaz/corth/blob/main/examples/loops.corth))
 - `halt` : ~~pops the elements at the top of the stack as an [exit status](https://en.wikipedia.org/wiki/Exit_status), then quits the program.~~ **Replaced by the `syscallN` feature. See `### System`.**
 
-### Memory
+### Memory  ([Example file](https://github.com/Ximaz/corth/blob/main/examples/memory.corth))
 - `mem` : pushes the address of the beginning of the readable/writable memory onto the stack.
 ```
 push(mem_address)
