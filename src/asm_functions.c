@@ -11,14 +11,14 @@ void asm_dump(FILE *f)
 {
     fprintf(f, ";; -- DUMP --\n");
     fprintf(f, ";; -9223372036854775807 <= rdi <= 9223372036854775807\n");
-    fprintf(f, "dump:\n");
+    fprintf(f, "dump: ; Checks the number nature. (n >= 0 ? / n <= 9 ?)\n");
     fprintf(f, "    push rbx\n");
     fprintf(f, "    mov rbx, rdi\n");
     fprintf(f, "    sub rsp, 16\n");
     fprintf(f, "    cmp rdi, 9\n");
     fprintf(f, "    lea rsi, [rsp+15]\n");
     fprintf(f, "    ja .L3\n");
-    fprintf(f, ".L5:\n");
+    fprintf(f, ".L5: ; Puts the digit into the stdout.\n");
     fprintf(f, "    mov edi, 1\n");
     fprintf(f, "    lea r8d, [rbx+48]\n");
     fprintf(f, "    mov BYTE [rsp+15], r8b\n");
@@ -28,11 +28,11 @@ void asm_dump(FILE *f)
     fprintf(f, "    add rsp, 16\n");
     fprintf(f, "    pop rbx\n");
     fprintf(f, "    ret\n");
-    fprintf(f, ".L3:\n");
+    fprintf(f, ".L3: ; Puts the '-' and absolutize the number.\n");
     fprintf(f, "    test rdi, rdi\n");
     fprintf(f, "    jns .L4\n");
     fprintf(f, "    mov edi, 1\n");
-    fprintf(f, "    mov BYTE [rsp+15], 45\n");
+    fprintf(f, "    mov BYTE [rsp+15], '-'\n");
     fprintf(f, "    mov eax, edi\n");
     fprintf(f, "    mov edx, edi\n");
     fprintf(f, "    syscall\n");
@@ -41,7 +41,7 @@ void asm_dump(FILE *f)
     fprintf(f, "    cmp rbx, -9\n");
     fprintf(f, "    mov rbx, rax\n");
     fprintf(f, "    jge .L5\n");
-    fprintf(f, ".L4:\n");
+    fprintf(f, ".L4: ; Do the maths to extract a digit and loop again with the rest. \n");
     fprintf(f, "    mov rax, rbx\n");
     fprintf(f, "    mov ecx, 10\n");
     fprintf(f, "    cqo\n");
