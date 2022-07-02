@@ -74,15 +74,15 @@ push(stack, b - a)
 ### Bitwise
 - `shr`
 ```
-a = pop(stack)
-b = pop(stack)
-push(a >> b)
+shifter = pop(stack)
+shifted = pop(stack)
+push(shifter >> shifted)
 ```
 - `shl`
 ```
-a = pop(stack)
-b = pop(stack)
-push(a << b)
+shifter = pop(stack)
+shifted = pop(stack)
+push(shifted << shifter)
 ```
 - `orb`
 ```
