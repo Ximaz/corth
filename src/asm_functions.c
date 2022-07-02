@@ -9,35 +9,48 @@
 
 void asm_dump(FILE *f)
 {
+    fprintf(f, ";; -- DUMP --\n");
+    fprintf(f, ";; -9223372036854775807 <= rdi <= 9223372036854775807\n");
     fprintf(f, "dump:\n");
-    fprintf(f, "    mov r8, 7378697629483820647\n");
-    fprintf(f, "    sub rsp, 40\n");
-    fprintf(f, "    mov byte [rsp+31], 10\n");
-    fprintf(f, "    lea rcx, [rsp+30]\n");
-    fprintf(f, "dump_L1:\n");
-    fprintf(f, "    mov rax, rdi\n");
-    fprintf(f, "    mov rsi, rcx\n");
-    fprintf(f, "    sub rcx, 1\n");
-    fprintf(f, "    imul r8\n");
-    fprintf(f, "    mov rax, rdi\n");
-    fprintf(f, "    sar rax, 63\n");
-    fprintf(f, "    sar rdx, 2\n");
-    fprintf(f, "    sub rdx, rax\n");
-    fprintf(f, "    lea rax, [rdx+rdx*4]\n");
-    fprintf(f, "    add rax, rax\n");
-    fprintf(f, "    sub rdi, rax\n");
-    fprintf(f, "    add edi, 48\n");
-    fprintf(f, "    mov byte [rcx+1], dil\n");
-    fprintf(f, "    mov rdi, rdx\n");
-    fprintf(f, "    test rdx, rdx\n");
-    fprintf(f, "    jne dump_L1\n");
-    fprintf(f, "    lea rdx, [rsp+32]\n");
+    fprintf(f, "    push rbx\n");
+    fprintf(f, "    mov rbx, rdi\n");
+    fprintf(f, "    sub rsp, 16\n");
+    fprintf(f, "    cmp rdi, 9\n");
+    fprintf(f, "    lea rsi, [rsp+15]\n");
+    fprintf(f, "    ja .L3\n");
+    fprintf(f, ".L5:\n");
     fprintf(f, "    mov edi, 1\n");
-    fprintf(f, "    sub rdx, rsi\n");
-    fprintf(f, "    mov rax, 1\n");
+    fprintf(f, "    lea r8d, [rbx+48]\n");
+    fprintf(f, "    mov BYTE [rsp+15], r8b\n");
+    fprintf(f, "    mov eax, edi\n");
+    fprintf(f, "    mov edx, edi\n");
     fprintf(f, "    syscall\n");
-    fprintf(f, "    add rsp, 40\n");
+    fprintf(f, "    add rsp, 16\n");
+    fprintf(f, "    pop rbx\n");
     fprintf(f, "    ret\n");
+    fprintf(f, ".L3:\n");
+    fprintf(f, "    test rdi, rdi\n");
+    fprintf(f, "    jns .L4\n");
+    fprintf(f, "    mov edi, 1\n");
+    fprintf(f, "    mov BYTE [rsp+15], 45\n");
+    fprintf(f, "    mov eax, edi\n");
+    fprintf(f, "    mov edx, edi\n");
+    fprintf(f, "    syscall\n");
+    fprintf(f, "    mov rax, rbx\n");
+    fprintf(f, "    neg rax\n");
+    fprintf(f, "    cmp rbx, -9\n");
+    fprintf(f, "    mov rbx, rax\n");
+    fprintf(f, "    jge .L5\n");
+    fprintf(f, ".L4:\n");
+    fprintf(f, "    mov rax, rbx\n");
+    fprintf(f, "    mov ecx, 10\n");
+    fprintf(f, "    cqo\n");
+    fprintf(f, "    idiv rcx\n");
+    fprintf(f, "    mov rdi, rax\n");
+    fprintf(f, "    mov rbx, rdx\n");
+    fprintf(f, "    call dump\n");
+    fprintf(f, "    lea rsi, [rsp+15]\n");
+    fprintf(f, "    jmp .L5\n");
 }
 
 void asm_header(FILE *f)

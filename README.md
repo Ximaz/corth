@@ -12,7 +12,7 @@ Corth is planned to be :
 
 ## TODO
 - [X] Fix the lexer about handling `\r\n` (Win) **AND** `\n` (Unix)
-- [ ] Fix the compiler about printing negative numbers. (Ex : `-10` -> `/0`)
+- [X] Fix the compiler about printing negative numbers. (Ex : `-10` -> `/0`)
 
 ## Quick Start
 
