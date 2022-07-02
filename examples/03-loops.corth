@@ -1,4 +1,4 @@
-30 0 while 2dup > do
+10 while dup 0 > do
     dup dump
-    1 +
+    1 -
 end
