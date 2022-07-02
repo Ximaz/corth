@@ -199,7 +199,7 @@ int run_program(program_t *self, int sim, int debug, char const *output)
                 // Invalid `else` end pointer.
                 assert((uint64) op->args[0] < self->instructions_len);
                 if (!sim)
-                    inst_else(f, op->args[0]);
+                    inst_else(f, op->args[0] + 1);
                 else
                     i = op->args[0];
                 break;
