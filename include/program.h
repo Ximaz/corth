@@ -3,6 +3,7 @@
 #include "ops.h"
 #include "token.h"
 #include "types.h"
+#include "debugger.h"
 
 typedef struct program_s
 {
@@ -12,6 +13,6 @@ typedef struct program_s
 
 program_t *new_program(tokens_t *tokens);
 void destroy_program(program_t *self);
-int run_program(program_t *self, int sim, int debug, char const *output);
+int run_program(program_t *self, int sim, debugger_t const debug, char const *output);
 
 #endif

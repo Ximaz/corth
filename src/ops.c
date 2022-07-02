@@ -24,6 +24,11 @@ inst_t *push(int64 n)
     return inst;
 }
 
+inst_t *pop(void)
+{
+    return new_op(OP_POP, 0);
+}
+
 inst_t *plus(void)
 {
     return new_op(OP_PLUS, 0);
@@ -167,4 +172,24 @@ inst_t *syscall5(void)
 inst_t *syscall6(void)
 {
     return new_op(OP_SYSCALL6, 0);
+}
+
+inst_t *shl(void)
+{
+    return new_op(OP_SHL, 0);
+}
+
+inst_t *shr(void)
+{
+    return new_op(OP_SHR, 0);
+}
+
+inst_t *orb(void)
+{
+    return new_op(OP_ORB, 0);
+}
+
+inst_t *andb(void)
+{
+    return new_op(OP_ANDB, 0);
 }

@@ -71,6 +71,33 @@ b = pop(stack)
 push(stack, b - a)
 ```
 
+### Bitwise
+- `shr`
+```
+a = pop(stack)
+b = pop(stack)
+push(a >> b)
+```
+- `shl`
+```
+a = pop(stack)
+b = pop(stack)
+push(a << b)
+```
+- `orb`
+```
+a = pop(stack)
+b = pop(stack)
+push(a | b)
+```
+- `andb`
+```
+a = pop(stack)
+b = pop(stack)
+push(a & b)
+```
+
+
 ### Comparisons
 - `!=`, `=`, `<`, `<=`, `>=` and `>` : pops two elements from the top of the stack, compares them, and pushes either `0` if the condition is not fulfilled or `1` if it is.
 

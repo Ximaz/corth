@@ -86,6 +86,20 @@ void inst_push(FILE *f, stack_t *stack, int64 n)
     }
 }
 
+int64 inst_pop(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+
+    if (stack) {
+        return pop_from(stack);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- POP --\n");
+        fprintf(f, "    pop rdi\n");
+    }
+    return 0;
+}
+
 void inst_plus(FILE *f, stack_t *stack)
 {
     assert(f || stack);
@@ -486,4 +500,84 @@ int inst_syscall(FILE *f, stack_t *stack, unsigned char *fake_mem, unsigned int 
         fprintf(f, "    syscall\n");
     }
     return 256;
+}
+
+void inst_shl(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0; // shifter
+    int64 n2 = 0; // shifted
+
+    if (stack) {
+        n1 = pop_from(stack);
+        n2 = pop_from(stack);
+        push_onto_stack(stack, n2 << n1);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- SHL --\n");
+        fprintf(f, "    pop rcx ; shifter\n");
+        fprintf(f, "    pop rax ; shifted\n");
+        fprintf(f, "    shl rax, cl\n");
+        fprintf(f, "    push rax\n");
+    }
+}
+
+void inst_shr(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0; // shifter
+    int64 n2 = 0; // shifted
+
+    if (stack) {
+        n1 = pop_from(stack);
+        n2 = pop_from(stack);
+        push_onto_stack(stack, n2 >> n1);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- SHR --\n");
+        fprintf(f, "    pop rcx ; shifter\n");
+        fprintf(f, "    pop rax ; shifted\n");
+        fprintf(f, "    shr rax, cl\n");
+        fprintf(f, "    push rax\n");
+    }
+}
+
+void inst_orb(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+    int64 n2 = 0;
+
+    if (stack) {
+        n2 = pop_from(stack);
+        n1 = pop_from(stack);
+        push_onto_stack(stack, n1 | n2);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- OR --\n");
+        fprintf(f, "    pop rax ; n1\n");
+        fprintf(f, "    pop rbx ; n1\n");
+        fprintf(f, "    or rax, rbx\n");
+        fprintf(f, "    push rax\n");
+    }
+}
+
+void inst_andb(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+    int64 n2 = 0;
+
+    if (stack) {
+        n2 = pop_from(stack);
+        n1 = pop_from(stack);
+        push_onto_stack(stack, n1 & n2);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- AND --\n");
+        fprintf(f, "    pop rax ; n1\n");
+        fprintf(f, "    pop rbx ; n1\n");
+        fprintf(f, "    and rax, rbx\n");
+        fprintf(f, "    push rax\n");
+    }
 }

@@ -16,7 +16,6 @@ static void debug_program(program_t *program)
     uint64 j = 0;
     inst_t *op = 0;
 
-    assert(COUNT_OPS == 27);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         printf("%llu: %s", i, OP_CODES[op->op_code]);
@@ -43,7 +42,7 @@ static program_t *preprocess_program(program_t *program)
     uint64 open_ptr = 0;
     stack_t *stack = new_stack();
 
-    assert(COUNT_OPS == 27);
+    assert(COUNT_OPS == 32);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op->op_code) {
@@ -117,17 +116,18 @@ program_t *new_program(tokens_t *tokens)
     return preprocess_program(program);
 }
 
-int run_program(program_t *self, int sim, int debug, char const *output)
+int run_program(program_t *self, int sim, debugger_t debug, char const *output)
 {
     int err = 0;
     FILE* f = 0;
     uint64 i = 0;
     inst_t *op = 0;
     stack_t *stack = 0;
+    int64 poped = 0;
     int exit_found = 0;
     unsigned char fake_mem[MEMORY_CAPACITY];
 
-    assert(COUNT_OPS == 27);
+    assert(COUNT_OPS == 32);
     if (!self)
         return 1;
     if (sim) {
@@ -141,9 +141,10 @@ int run_program(program_t *self, int sim, int debug, char const *output)
         f = open_file(output, "w");
         asm_header(f);
     }
-    if (debug && sim)
+    if (debug.enabled)
+        debug_program(self);
+    if (sim && debug.enabled && debug.debug_stack)
         debug_stack(stack, 0);
-    debug_program(self);
     for (; i < self->instructions_len && !exit_found; i++) {
         op = self->instructions[i];
         if (!sim)
@@ -151,6 +152,12 @@ int run_program(program_t *self, int sim, int debug, char const *output)
         switch (op->op_code) {
             case OP_PUSH:
                 inst_push(f, stack, op->args[0]);
+                break;
+            case OP_POP:
+                // For now, poped won't do anthing.
+                poped = inst_pop(f, stack);
+                // Just to avoid the unused error.
+                poped++; poped--;
                 break;
             case OP_PLUS:
                 inst_plus(f, stack);
@@ -256,14 +263,28 @@ int run_program(program_t *self, int sim, int debug, char const *output)
             case OP_SYSCALL6:
                 inst_syscall(f, stack, fake_mem, 6);
                 break;
+            case OP_SHL:
+                inst_shl(f, stack);
+                break;
+            case OP_SHR:
+                inst_shr(f, stack);
+                break;
+            case OP_ORB:
+                inst_orb(f, stack);
+                break;
+            case OP_ANDB:
+                inst_andb(f, stack);
+                break;
             default:
                 // Unreachable.
                 assert(0);
                 break;
         }
-        if (debug && sim) {
-            debug_stack(stack, op);
-            debug_memory(fake_mem, 3);
+        if (debug.enabled && sim) {
+            if (debug.debug_stack)
+                debug_stack(stack, op);
+            if (debug.debug_memory)
+                debug_memory(fake_mem, debug.mem_lim);
         }
     }
     if (!sim) {

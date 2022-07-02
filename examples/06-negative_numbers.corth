@@ -1,8 +1,0 @@
-mem dup 10 store 1 +
-mem -
-0 10 - dump
-dup mem 1 1 syscall3
-0 480305 - dump
-dup mem 1 1 syscall3
-0 56 - dump
-dup mem 1 1 syscall3

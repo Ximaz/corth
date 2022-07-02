@@ -5,6 +5,7 @@
 typedef enum op_code_e
 {
     OP_PUSH,
+    OP_POP,
     OP_PLUS,
     OP_MINUS,
     OP_DUMP,
@@ -31,6 +32,10 @@ typedef enum op_code_e
     OP_SYSCALL4,
     OP_SYSCALL5,
     OP_SYSCALL6,
+    OP_SHL,
+    OP_SHR,
+    OP_ORB,
+    OP_ANDB,
     COUNT_OPS,
 } op_code_t;
 
@@ -52,6 +57,7 @@ typedef struct op_s {
 static char *const OP_CODES[] = {
 
     "OP_PUSH",
+    "OP_POP"
     "OP_PLUS",
     "OP_MINUS",
     "OP_DUMP",
@@ -78,9 +84,14 @@ static char *const OP_CODES[] = {
     "OP_SYSCALL4",
     "OP_SYSCALL5",
     "OP_SYSCALL6",
+    "OP_SHL",
+    "OP_SHR",
+    "OP_ORB",
+    "OP_ANDB",
 };
 
 inst_t *push(int64 n);
+inst_t *pop(void);
 inst_t *plus(void);
 inst_t *minus(void);
 inst_t *dump(void);
@@ -107,8 +118,13 @@ inst_t *syscall3(void);
 inst_t *syscall4(void);
 inst_t *syscall5(void);
 inst_t *syscall6(void);
+inst_t *shl(void);
+inst_t *shr(void);
+inst_t *orb(void);
+inst_t *andb(void);
 
 static op_t const OPS_MAP[] = {
+    { "pop", &pop },
     { "+", &plus },
     { "-", &minus },
     { "dump", &dump },
@@ -135,6 +151,10 @@ static op_t const OPS_MAP[] = {
     { "syscall4", &syscall4 },
     { "syscall5", &syscall5 },
     { "syscall6", &syscall6 },
+    { "shl", &shl},
+    { "shr", &shr},
+    { "orb", &orb},
+    { "andb", &andb},
 };
 
 static char const COMMENT[] = {'/', '/', 0};
