@@ -9,6 +9,7 @@ typedef enum op_code_e
     OP_MINUS,
     OP_DUMP,
     OP_DUP,
+    OP_2DUP,
     OP_EQUAL,
     OP_DIFF,
     OP_GT,
@@ -55,6 +56,7 @@ static char *const OP_CODES[] = {
     "OP_MINUS",
     "OP_DUMP",
     "OP_DUP",
+    "OP_2DUP",
     "OP_EQUAL",
     "OP_DIFF",
     "OP_GT",
@@ -83,6 +85,7 @@ inst_t *plus(void);
 inst_t *minus(void);
 inst_t *dump(void);
 inst_t *dupp(void);
+inst_t *_2dupp(void);
 inst_t *equal(void);
 inst_t *diff(void);
 inst_t *gt(void);
@@ -110,6 +113,7 @@ static op_t const OPS_MAP[] = {
     { "-", &minus },
     { "dump", &dump },
     { "dup", &dupp },
+    { "2dup", &_2dupp },
     { "=", &equal },
     { "!=", &diff },
     { ">", &gt },

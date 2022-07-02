@@ -5,6 +5,7 @@
 #include "../include/ops.h"
 #include "../include/types.h"
 #include "../include/stack.h"
+#include "../include/debugger.h"
 #include "../include/asm_functions.h"
 
 void asm_dump(FILE *f)
@@ -155,6 +156,31 @@ void inst_dupp(FILE *f, stack_t *stack)
         fprintf(f, "    ;; -- DUP --\n");
         fprintf(f, "    pop rax\n");
         fprintf(f, "    push rax\n");
+        fprintf(f, "    push rax\n");
+    }
+}
+
+void inst_2dupp(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+    int64 n2 = 0;
+
+    if (stack) {
+        n1 = pop_from(stack);
+        n2 = pop_from(stack);
+        push_onto_stack(stack, n2);
+        push_onto_stack(stack, n1);
+        push_onto_stack(stack, n2);
+        push_onto_stack(stack, n1);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- 2DUP --\n");
+        fprintf(f, "    pop rax\n");
+        fprintf(f, "    pop rbx\n");
+        fprintf(f, "    push rbx\n");
+        fprintf(f, "    push rax\n");
+        fprintf(f, "    push rbx\n");
         fprintf(f, "    push rax\n");
     }
 }
@@ -345,14 +371,11 @@ int inst_do(FILE *f, stack_t *stack, uint64 end_addr)
     return 0;
 }
 
-void inst_end(FILE *f, uint64 end_addr, uint64 next_addr)
+void inst_end(FILE *f, uint64 next_addr)
 {
     assert(f);
 
-    if (end_addr != next_addr)
-        fprintf(f, "    jmp addr_%llu\n", next_addr);
-    else
-        fprintf(f, "    jmp addr_%llu\n", end_addr);
+    fprintf(f, "    jmp addr_%llu\n", next_addr);
     fprintf(f, ";; -- END --\n");
 }
 

@@ -1,6 +1,6 @@
 CC=gcc
 NAME=corth
-SRC=*.c
+SRC=corth.c
 OBJ=*.o
 CORTH_LIB=-Iinclude/ -Lsrc -lcorth
 CFLAGS=-Wall -Wextra -Werror -Wdeprecated -Wno-comment -pedantic -g -O0

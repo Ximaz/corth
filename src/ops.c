@@ -44,6 +44,11 @@ inst_t *dupp(void)
     return new_op(OP_DUP, 0);
 }
 
+inst_t *_2dupp(void)
+{
+    return new_op(OP_2DUP, 0);
+}
+
 inst_t *equal(void)
 {
     return new_op(OP_EQUAL, 0);

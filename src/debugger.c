@@ -13,7 +13,7 @@ void debug_stack(stack_t *stack, inst_t *op)
     uint64 j = 0;
     uint64 n_len = 0;
     uint64 op_arg_i = 0;
-    uint64 i = stack->top;
+    int64 i = stack->top;
 
     if (!op)
         printf("\nPROGRAM BEGINS\n");
@@ -31,7 +31,7 @@ void debug_stack(stack_t *stack, inst_t *op)
         printf("\n");
     }
     printf("|--------------------------|\n");
-    for (; i > 0 ; i--) {
+    for (--i; i >= 0 ; i--) {
         sprintf(n, "%lld", stack->elements[i]);
         n_len = strlen(n);
         padding = 12;
@@ -44,7 +44,7 @@ void debug_stack(stack_t *stack, inst_t *op)
             printf(" ");
         printf("|\n");
         j = 0;
-        if (i - 1 > 0)
+        if (i > 0)
             printf("|--------------------------|\n");
     }
     printf("|--------------------------|\n\n");
