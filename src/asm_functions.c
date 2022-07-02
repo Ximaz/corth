@@ -11,7 +11,7 @@ void asm_dump(FILE *f)
 {
     fprintf(f, ";; -- DUMP --\n");
     fprintf(f, ";; -9223372036854775807 <= rdi <= 9223372036854775807\n");
-    fprintf(f, "dump: ; Checks the number nature. (n >= 0 ? / n <= 9 ?)\n");
+    fprintf(f, "dump: ; Checks the number's nature. (n >= 0 ? / n <= 9 ?)\n");
     fprintf(f, "    push rbx\n");
     fprintf(f, "    mov rbx, rdi\n");
     fprintf(f, "    sub rsp, 16\n");
