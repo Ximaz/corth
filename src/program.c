@@ -158,7 +158,7 @@ int run_program(program_t *self, int sim, debugger_t const *debug, char const *o
     }
     clear_memory(fake_mem);
     self = preprocess_program(self, debug);
-    debug_program(self);
+    // debug_program(self);
     if (sim && debug->enabled && debug->debug_stack)
         debug_stack(stack, 0);
     for (; i < self->instructions_len && !exit_found; i++) {
