@@ -68,8 +68,14 @@ token_t *new_token(char const *filename, uint64 row, uint64 col, char *word)
 
 void destroy_token(token_t *self)
 {
-    if (self)
+    if (self) {
+        if (self->instruction) {
+            if (self->instruction->args)
+                free(self->instruction->args);
+            free(self->instruction);
+        }
         free(self);
+    }
 }
 
 tokens_t *new_tokens(void)

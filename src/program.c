@@ -148,13 +148,10 @@ int run_program(tokens_t *self, int sim, debugger_t const *debug, char const *ou
         f = open_file(output, "w");
         asm_header(f);
     }
-    if (debug->debug_tokens)
+    if (debug->enabled && debug->debug_tokens)
         debug_tokens(self);
     clear_memory(fake_mem);
     self = preprocess_program(self, debug);
-    // debug_program(self);
-    if (sim && debug->enabled && debug->debug_stack)
-        debug_stack(stack, 0);
     for (; i < self->tokens_len && !exit_found; i++) {
         op = self->tokens[i]->instruction;
         if (!sim)
@@ -315,5 +312,7 @@ int run_program(tokens_t *self, int sim, debugger_t const *debug, char const *ou
         asm_footer(f);
         fclose(f);
     }
+    if (sim)
+        destroy_stack(stack);
     return err;
 }

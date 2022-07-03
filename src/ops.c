@@ -1,5 +1,6 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 #include "../include/ops.h"
 #include "../include/program.h"
 

@@ -9,12 +9,16 @@
 
 void debug_stack(stack_t *stack, inst_t *op)
 {
+    // NOT IMPLEMENTED FOR NEW VERSION.
+    // inst_arg_t needs to track which
+    // type it is without alterating data.
+    return;
     uint64 padding_i = 0;
     uint64 padding = 16;
     inst_arg_t arg;
     char buff[33];
     uint64 buff_len = 0;
-    int64 stack_cursor = stack->top - 1;
+    int64 stack_cursor = stack->top;
 
     if (!op)
         return;
@@ -22,7 +26,7 @@ void debug_stack(stack_t *stack, inst_t *op)
     for (padding_i = 0; padding_i < 2 * padding + 2; padding_i++)
         printf("-");
     printf("|\n");
-    for (; stack_cursor >= 0; stack_cursor--) {
+    for (--stack_cursor; stack_cursor >= 0; stack_cursor--) {
         arg = stack->elements[stack_cursor];
         if (arg.word) {
             snprintf(buff, 26, "\"%s ...\"", arg.word);
@@ -37,18 +41,16 @@ void debug_stack(stack_t *stack, inst_t *op)
         }
         buff_len = strlen(buff);
         printf("|");
-        for (padding_i = 0; padding_i < padding / 2 - buff_len / 2; padding_i++)
+        for (padding_i = 0; padding_i < padding / 2 + buff_len / 2 + 1; padding_i++)
             printf(" ");
         printf("%s", buff);
-        for (padding_i = 0; padding_i < padding / 2 - buff_len / 2; padding_i++)
+        for (padding_i = 0; padding_i < padding / 2 + buff_len / 2 + 1; padding_i++)
             printf(" ");
         printf("|\n");
-        if (stack_cursor > 0) {
-            printf("|");
-            for (padding_i = 0; padding_i < 2 * padding + 2; padding_i++)
-                printf("-");
-            printf("|\n");
-        }
+        printf("|");
+        for (padding_i = 0; padding_i < 2 * padding + 2; padding_i++)
+            printf("-");
+        printf("|\n");
     }
 }
 
@@ -68,6 +70,10 @@ void debug_memory(unsigned char *fake_mem, uint64 limit)
 
 void debug_program(tokens_t *self)
 {
+    // NOT IMPLEMENTED FOR NEW VERSION.
+    // inst_arg_t needs to track which
+    // type it is without alterating data.
+    return;
     uint64 i = 0;
     uint64 j = 0;
     inst_t *op = 0;
