@@ -6,7 +6,7 @@ Corth is planned to be :
 - [X] Compiled
 - [X] Native
 - [X] Stack based (just like Porth and Forth)
-- [ ] Turing-complete
+- [X] Turing-complete (Rule 110)
 - [ ] Statically typed
 - [ ] Self-hosted
 
