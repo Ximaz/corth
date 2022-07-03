@@ -25,10 +25,9 @@ typedef union inst_arg_u
 
 typedef enum token_type_e
 {
-    TOKEN_ID,
     TOKEN_INT,
     TOKEN_WORD,
-    COUNT_TYPES
+    COUNT_TOKENS
 } token_type_t;
 
 static char *const TOKEN_TYPES[] = {
