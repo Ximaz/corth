@@ -3,13 +3,15 @@
 #include "ops.h"
 #include "types.h"
 
+
 typedef struct token_s
 {
-    char const *filename;
-    char *token;
-    inst_t *instruction;
+    // Where does the token come from ?
     uint64 row;
     uint64 col;
+    char const *filename;
+    // The token properties :
+    inst_t *instruction;
 } token_t;
 
 typedef struct tokens_s
@@ -18,7 +20,7 @@ typedef struct tokens_s
     token_t **tokens;
 } tokens_t;
 
-token_t *new_token(char const *filename, char *line, uint64 line_i, uint64 col);
+token_t *new_token(char const *filename, uint64 row, uint64 col, char *word);
 void destroy_token(token_t *self);
 
 tokens_t *new_tokens(void);

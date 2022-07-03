@@ -9,42 +9,47 @@
 
 void debug_stack(stack_t *stack, inst_t *op)
 {
-    uint64 padding = 0;
-    char n[21];
-    uint64 j = 0;
-    uint64 n_len = 0;
-    uint64 op_arg_i = 0;
-    int64 i = stack->top;
+    uint64 padding_i = 0;
+    uint64 padding = 16;
+    inst_arg_t arg;
+    char buff[33];
+    uint64 buff_len = 0;
+    int64 stack_cursor = stack->top - 1;
 
     if (!op)
-        printf("\nPROGRAM BEGINS\n");
-    else {
-        printf("\nOP CODE : %s\nARGC : %llu\nARGV : ", OP_CODES[op->op_code], op->args_len);
-        if (op->args_len == 0)
-            printf("No argument found.");
-        else {
-            printf("%lld (%s)", op->args[op_arg_i], op->op_code == OP_PUSH ? "number" : "address");
+        return;
+    printf("|");
+    for (padding_i = 0; padding_i < 2 * padding + 2; padding_i++)
+        printf("-");
+    printf("|\n");
+    for (; stack_cursor >= 0; stack_cursor--) {
+        arg = stack->elements[stack_cursor];
+        if (arg.word) {
+            snprintf(buff, 26, "\"%s ...\"", arg.word);
+        } else if (arg.integer) {
+            sprintf(buff, "%lld (int)", arg.integer);
+        } else if (arg.ptr) {
+            sprintf(buff, "%lld (ptr)", arg.ptr);
+        } else if (arg.statement) {
+            sprintf(buff, "%d (stmt)", arg.statement);
+        } else {
+            sprintf(buff, "X (ukwn)");
         }
-        printf("\n");
-    }
-    printf("|--------------------------|\n");
-    for (--i; i >= 0 ; i--) {
-        sprintf(n, "%lld", stack->elements[i]);
-        n_len = strlen(n);
-        padding = 12;
+        buff_len = strlen(buff);
         printf("|");
-        for (; j < padding - n_len / 2 - (n_len % 2 == 1) + (stack->elements[i] >= 0); j++)
+        for (padding_i = 0; padding_i < padding / 2 - buff_len / 2; padding_i++)
             printf(" ");
-        printf("%s", n);
-        j = 0;
-        for (; j < padding -  n_len / 2 + 1; j++)
+        printf("%s", buff);
+        for (padding_i = 0; padding_i < padding / 2 - buff_len / 2; padding_i++)
             printf(" ");
         printf("|\n");
-        j = 0;
-        if (i > 0)
-            printf("|--------------------------|\n");
+        if (stack_cursor > 0) {
+            printf("|");
+            for (padding_i = 0; padding_i < 2 * padding + 2; padding_i++)
+                printf("-");
+            printf("|\n");
+        }
     }
-    printf("|--------------------------|\n\n");
 }
 
 void debug_memory(unsigned char *fake_mem, uint64 limit)
@@ -66,6 +71,7 @@ void debug_program(program_t *self)
     uint64 i = 0;
     uint64 j = 0;
     inst_t *op = 0;
+    inst_arg_t arg;
 
     for (; i < self->instructions_len; i++) {
         op = self->instructions[i];
@@ -73,7 +79,18 @@ void debug_program(program_t *self)
         if (op->args_len > 0) {
             printf(": ");
             for (; j < op->args_len; j++) {
-                printf("%lld", op->args[j]);
+                arg = op->args[j];
+                if (arg.word)
+                    printf("%s (str)", arg.word);
+                else if (arg.integer) {
+                    printf("%lld (int)", arg.integer);
+                } else if (arg.ptr) {
+                    printf("%lld (ptr)", arg.ptr);
+                } else if (arg.statement) {
+                    printf("%d (stmt)", arg.statement);
+                } else {
+                    printf("X (ukwn)");
+                }
                 if (j < op->args_len - 1)
                     printf(", ");
             }

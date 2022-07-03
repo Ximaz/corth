@@ -5,6 +5,7 @@
 typedef enum op_code_e
 {
     OP_PUSH,
+    OP_STRING,
     OP_POP,
     OP_PLUS,
     OP_MINUS,
@@ -45,19 +46,21 @@ typedef struct inst_s
 {
     op_code_t op_code;
     uint64 args_len;
-    int64 *args;
+    inst_arg_t *args;
+    inst_type_t type;
 } inst_t;
 
 // This struct must be used only for tokens
 // which have no params.
 // e.g : can't be used for `push` op.
 typedef struct op_s {
-    char const *sym;
+    char const *word;
     inst_t *(*func)(void);
 } op_t;
 
 static char *const OP_CODES[] = {
     "OP_PUSH",
+    "OP_STRING",
     "OP_POP",
     "OP_PLUS",
     "OP_MINUS",
@@ -94,6 +97,7 @@ static char *const OP_CODES[] = {
 };
 
 inst_t *push(int64 n);
+inst_t *string(char *s);
 inst_t *pop(void);
 inst_t *plus(void);
 inst_t *minus(void);
@@ -165,5 +169,6 @@ static op_t const OPS_MAP[] = {
 };
 
 static char const COMMENT[] = {'/', '/', 0};
+void clear_arg(inst_arg_t *arg);
 
 #endif

@@ -27,18 +27,17 @@ static char *strip_end_of_line(char *line)
 
 tokens_t *lex_from_line(char const *filename, char *line, uint64 line_i, tokens_t *tokens)
 {
-    size_t i = 0;
-    char *tvalue = 0;
+    size_t i = trim_line(line, 0);
+    char *word = 0;
     token_t *token = 0;
 
-    i = trim_line(line, 0);
     line = strip_end_of_line(line);
-    tvalue = strtok(line, " ");
-    while (tvalue && strncmp(tvalue, COMMENT, 2) != 0) {
-        token = new_token(filename, tvalue, line_i, i);
-        i += strlen(tvalue) + 1;
+    word = strtok(line, " ");
+    while (word && strncmp(word, COMMENT, 2) != 0) {
+        token = new_token(filename, line_i, i, word);
+        i += strlen(word) + 1;
         push_token(tokens, token);
-        tvalue = strtok(0, " ");
+        word = strtok(0, " ");
     }
     return tokens;
 }

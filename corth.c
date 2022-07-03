@@ -21,6 +21,10 @@ static debugger_t *build_debugger(int argc, char *const *argv)
 
     if (!debug)
         return debug;
+    debug->debug_stack = 0;
+    debug->debug_memory = 0;
+    debug->debug_bindings = 0;
+    debug->debug_jumps = 0;
     debug->mem_lim = 15;
     for (; i < argc; i++) {
         if (strcmp(argv[i], "-dall") == 0) {
