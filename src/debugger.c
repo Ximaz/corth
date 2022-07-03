@@ -9,46 +9,34 @@
 
 void debug_stack(stack_t *stack, inst_t *op)
 {
-    // NOT IMPLEMENTED FOR NEW VERSION.
-    // inst_arg_t needs to track which
-    // type it is without alterating data.
-    return;
-    uint64 padding_i = 0;
-    uint64 padding = 16;
+    char buff[21];
     inst_arg_t arg;
-    char buff[33];
     uint64 buff_len = 0;
+    uint64 display = 26;
+    uint64 padding = 0;
+    uint64 padding_i = 0;
     int64 stack_cursor = stack->top;
 
     if (!op)
         return;
     printf("|");
-    for (padding_i = 0; padding_i < 2 * padding + 2; padding_i++)
+    for (padding_i = 0; padding_i < display; padding_i++)
         printf("-");
     printf("|\n");
     for (--stack_cursor; stack_cursor >= 0; stack_cursor--) {
         arg = stack->elements[stack_cursor];
-        if (arg.word) {
-            snprintf(buff, 26, "\"%s ...\"", arg.word);
-        } else if (arg.integer) {
-            sprintf(buff, "%lld (int)", arg.integer);
-        } else if (arg.ptr) {
-            sprintf(buff, "%lld (ptr)", arg.ptr);
-        } else if (arg.statement) {
-            sprintf(buff, "%d (stmt)", arg.statement);
-        } else {
-            sprintf(buff, "X (ukwn)");
-        }
+        snprintf(buff, 21, "%lld", arg.integer);
         buff_len = strlen(buff);
+        padding = (display - buff_len) / 2;
         printf("|");
-        for (padding_i = 0; padding_i < padding / 2 + buff_len / 2 + 1; padding_i++)
+        for (padding_i = 0; padding_i < padding; padding_i++)
             printf(" ");
         printf("%s", buff);
-        for (padding_i = 0; padding_i < padding / 2 + buff_len / 2 + 1; padding_i++)
+        for (padding_i = 0; padding_i < display - (buff_len + padding); padding_i++)
             printf(" ");
         printf("|\n");
         printf("|");
-        for (padding_i = 0; padding_i < 2 * padding + 2; padding_i++)
+        for (padding_i = 0; padding_i < display; padding_i++)
             printf("-");
         printf("|\n");
     }
@@ -70,10 +58,6 @@ void debug_memory(unsigned char *fake_mem, uint64 limit)
 
 void debug_program(tokens_t *self)
 {
-    // NOT IMPLEMENTED FOR NEW VERSION.
-    // inst_arg_t needs to track which
-    // type it is without alterating data.
-    return;
     uint64 i = 0;
     uint64 j = 0;
     inst_t *op = 0;
@@ -86,17 +70,7 @@ void debug_program(tokens_t *self)
             printf(": ");
             for (; j < op->args_len; j++) {
                 arg = op->args[j];
-                if (arg.word)
-                    printf("%s (str)", arg.word);
-                else if (arg.integer) {
-                    printf("%lld (int)", arg.integer);
-                } else if (arg.ptr) {
-                    printf("%lld (ptr)", arg.ptr);
-                } else if (arg.statement) {
-                    printf("%d (stmt)", arg.statement);
-                } else {
-                    printf("X (ukwn)");
-                }
+                printf("%lld", arg.integer);
                 if (j < op->args_len - 1)
                     printf(", ");
             }
