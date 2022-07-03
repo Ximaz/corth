@@ -249,7 +249,8 @@ int run_program(program_t *self, int sim, debugger_t const *debug, char const *o
                 else {
                     if (debug->debug_jumps)
                         debug_jump(self, op, i, tmp_ptr);
-                    i = tmp_ptr - 1; // To avoid the ++ of the for loop.
+                    i = tmp_ptr; // We want to jump to the `end` + 1, no need to substract because of for loop.
+                                 // When substracting : create an infinite loop.
                 }
                 break;
             case OP_MEM:
