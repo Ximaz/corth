@@ -35,4 +35,6 @@ void inst_shl(FILE *f, stack_t *stack);
 void inst_shr(FILE *f, stack_t *stack);
 void inst_orb(FILE *f, stack_t *stack);
 void inst_andb(FILE *f, stack_t *stack);
+void inst_swap(FILE *f, stack_t *stack);
+void inst_over(FILE *f, stack_t *stack);
 #endif

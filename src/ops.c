@@ -193,3 +193,13 @@ inst_t *andb(void)
 {
     return new_op(OP_ANDB, 0);
 }
+
+inst_t *swap(void)
+{
+    return new_op(OP_SWAP, 0);
+}
+
+inst_t *over(void)
+{
+    return new_op(OP_OVER, 0);
+}

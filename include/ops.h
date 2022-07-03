@@ -36,6 +36,8 @@ typedef enum op_code_e
     OP_SHR,
     OP_ORB,
     OP_ANDB,
+    OP_SWAP,
+    OP_OVER,
     COUNT_OPS,
 } op_code_t;
 
@@ -86,7 +88,9 @@ static char *const OP_CODES[] = {
     "OP_SHL",
     "OP_SHR",
     "OP_ORB",
-    "OP_ANDB"
+    "OP_ANDB",
+    "OP_SWAP",
+    "OP_OVER"
 };
 
 inst_t *push(int64 n);
@@ -121,6 +125,8 @@ inst_t *shl(void);
 inst_t *shr(void);
 inst_t *orb(void);
 inst_t *andb(void);
+inst_t *swap(void);
+inst_t *over(void);
 
 static op_t const OPS_MAP[] = {
     { "pop", &pop },
@@ -154,6 +160,8 @@ static op_t const OPS_MAP[] = {
     { "shr", &shr},
     { "orb", &orb},
     { "andb", &andb},
+    { "swap", &swap},
+    { "over", &over},
 };
 
 static char const COMMENT[] = {'/', '/', 0};

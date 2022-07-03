@@ -45,6 +45,10 @@ This is what the language supports so far. **Since the language is a work in pro
 ```
 push(stack, <integer>)
 ```
+- `pop` : pops the element at the top of the stack. (Not returned yet)
+```
+pop(stack)
+```
 - `dup` : duplicates an element on the top of the stack.
 ```
 a = pop(stack)
@@ -108,6 +112,21 @@ push(a & b)
 
 ### Memory  ([Example file](https://github.com/Ximaz/corth/blob/main/examples/memory.corth))
 - `mem` : pushes the address of the beginning of the readable/writable memory onto the stack.
+- `over` : duplicates the element just before the one at the top of the stack.
+```
+a = pop(stack)
+b = pop(stack)
+push(stack, b)
+push(stack, a)
+push(stack, b)
+```
+- `swap` : swaps the two elements at the top of the stack.
+```
+a = pop(stack)
+b = pop(stack)
+push(stack, a)
+push(stack, b)
+```
 ```
 push(mem_address)
 ```

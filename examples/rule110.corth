@@ -1,0 +1,35 @@
+mem 48 + 1 store
+
+0 while dup 48 < do
+    0 while dup 50 < do
+        dup mem + load if
+            mem 50 + 42 store
+        else
+            mem 50 + 32 store
+        end
+        1 mem 50 + 1 1 syscall3
+
+        1 +
+    end
+    pop // pop the counter.
+
+    mem 50 + 10 store
+    1 mem 50 + 1 1 syscall3
+
+    mem load 1 shl
+    mem 1 + load
+    orb
+
+    1 while dup 49 < do
+        swap 1 shl 7 andb
+        over mem + 1 + load orb
+        2dup 110 swap shr 1 andb
+        swap mem + swap store
+        swap
+        1 +
+    end
+    pop // pop the pattern.
+    pop // pop the counter.
+    1 +
+end
+pop // pop the counter.

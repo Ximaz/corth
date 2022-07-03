@@ -20,7 +20,7 @@ static program_t *preprocess_program(program_t *program, debugger_t const *debug
     // int64 tmp_pointer = 0;
     stack_t *stack = new_stack();
 
-    assert(COUNT_OPS == 32);
+    assert(COUNT_OPS == 34);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op->op_code) {
@@ -142,7 +142,7 @@ int run_program(program_t *self, int sim, debugger_t const *debug, char const *o
     int exit_found = 0;
     unsigned char fake_mem[MEMORY_CAPACITY];
 
-    assert(COUNT_OPS == 32);
+    assert(COUNT_OPS == 34);
     if (!self)
         return 1;
     if (sim) {
@@ -296,6 +296,12 @@ int run_program(program_t *self, int sim, debugger_t const *debug, char const *o
                 break;
             case OP_ANDB:
                 inst_andb(f, stack);
+                break;
+            case OP_SWAP:
+                inst_swap(f, stack);
+                break;
+            case OP_OVER:
+                inst_over(f, stack);
                 break;
             default:
                 // Unreachable.

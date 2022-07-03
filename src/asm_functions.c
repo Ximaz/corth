@@ -582,3 +582,47 @@ void inst_andb(FILE *f, stack_t *stack)
         fprintf(f, "    push rax\n");
     }
 }
+
+void inst_swap(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+    int64 n2 = 0;
+
+    if (stack) {
+        n1 = pop_from(stack);
+        n2 = pop_from(stack);
+        push_onto_stack(stack, n1);
+        push_onto_stack(stack, n2);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- SWAP --\n");
+        fprintf(f, "    pop rax\n");
+        fprintf(f, "    pop rbx\n");
+        fprintf(f, "    push rax\n");
+        fprintf(f, "    push rbx\n");
+    }
+}
+
+void inst_over(FILE *f, stack_t *stack)
+{
+    assert(f || stack);
+    int64 n1 = 0;
+    int64 n2 = 0;
+
+    if (stack) {
+        n2 = pop_from(stack);
+        n1 = pop_from(stack);
+        push_onto_stack(stack, n1);
+        push_onto_stack(stack, n2);
+        push_onto_stack(stack, n1);
+    }
+    if (f) {
+        fprintf(f, "    ;; -- OVER --\n");
+        fprintf(f, "    pop rbx\n");
+        fprintf(f, "    pop rax\n");
+        fprintf(f, "    push rax\n");
+        fprintf(f, "    push rbx\n");
+        fprintf(f, "    push rax\n");
+    }
+}
