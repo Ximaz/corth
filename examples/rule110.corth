@@ -1,3 +1,7 @@
+//|board             |                   |
+// ^
+// mem
+
 mem 98 + 1 store
 
 0 while dup 98 < do
@@ -10,7 +14,7 @@ mem 98 + 1 store
       1 +
    end
    mem + 100 + 10 store
-   101 mem 100 + 1 1 syscall3 pop
+   101 mem 100 + 1 1 syscall3
 
    // pattern
    mem     load 1 shl
