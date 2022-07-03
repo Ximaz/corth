@@ -22,7 +22,7 @@ void inst_gt(FILE *f, stack_t *stack);
 void inst_lt(FILE *f, stack_t *stack);
 void inst_goet(FILE *f, stack_t *stack);
 void inst_loet(FILE *f, stack_t *stack);
-int inst_if(FILE *f, stack_t *stack, uint64 end_addr, int is_else);
+int inst_if(FILE *f, stack_t *stack, uint64 end_addr, op_code_t op_code);
 void inst_else(FILE *f, uint64 end_addr);
 void inst_while(FILE *f);
 int inst_do(FILE *f, stack_t *stack, uint64 end_addr);

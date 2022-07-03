@@ -10,81 +10,87 @@
 #include "../include/file_handler.h"
 #include "../include/asm_functions.h"
 
-static void debug_program(program_t *program)
-{
-    uint64 i = 0;
-    uint64 j = 0;
-    inst_t *op = 0;
-
-    for (; i < program->instructions_len; i++) {
-        op = program->instructions[i];
-        printf("%llu: %s", i, OP_CODES[op->op_code]);
-        if (op->args_len > 0) {
-            printf(": ");
-            for (; j < op->args_len; j++) {
-                printf("%lld", op->args[j]);
-                if (j < op->args_len - 1)
-                    printf(", ");
-            }
-            j = 0;
-        }
-        if (i < program->instructions_len - 1)
-            printf(",");
-        printf("\n");
-    }
-}
-
-static program_t *preprocess_program(program_t *program)
+static program_t *preprocess_program(program_t *program, debugger_t const *debug)
 {
     uint64 i = 0;
     inst_t *op = 0;
+    int64 op_pointer = 0;
     inst_t *pointed_op = 0;
-    uint64 open_ptr = 0;
+    // inst_t *tmp = 0;
+    // int64 tmp_pointer = 0;
     stack_t *stack = new_stack();
 
     assert(COUNT_OPS == 32);
     for (; i < program->instructions_len; i++) {
         op = program->instructions[i];
         switch (op->op_code) {
+            // `if` will have to point either to itself or an `else` address.
             case OP_IF:
-                program->instructions[i]->args[0] = i;
                 push_onto_stack(stack, i);
                 break;
+            // `else` will have to point the `end` address.
             case OP_ELSE:
-                program->instructions[i]->args[0] = i;
                 // The `ìf` address.
-                open_ptr = pop_from(stack);
-                // `else` can only be used in `if` blocks.
-                assert(program->instructions[open_ptr]->op_code == OP_IF);
+                op_pointer = pop_from(stack);
                 // The `if` instruction.
-                pointed_op = program->instructions[open_ptr];
+                pointed_op = program->instructions[op_pointer];
+                // `else` can only be used in `if` blocks.
+                assert(pointed_op->op_code == OP_IF);
                 // `if` will points to the next instruction after `else`.
+                // if not + 1, if would point to the `else` adress which points
+                // to the end address. So the `else` body would not have been
+                // executed.
+                if (debug->debug_bindings)
+                    debug_binding(pointed_op, op_pointer, "else next instruction", i + 1);
                 pointed_op->args[0] = i + 1;
+                assert(program->instructions[op_pointer]->args[0] == pointed_op->args[0]);
                 push_onto_stack(stack, i);
                 break;
             case OP_WHILE:
                 push_onto_stack(stack, i);
                 break;
+            // `do` will have to point the `end` address.
             case OP_DO:
                 // The `while` address.
-                open_ptr = pop_from(stack);
-                // `do` points to the while address.
-                program->instructions[i]->args[0] = open_ptr;
+                op_pointer = pop_from(stack);
+                // The `while` instruction.
+                pointed_op = program->instructions[op_pointer];
+                assert(pointed_op->op_code == OP_WHILE);
+                // `do` now points to the `while` block.
+                if (debug->debug_bindings)
+                    debug_binding(op, i, OP_CODES[pointed_op->op_code], op_pointer);
+                op->args[0] = op_pointer;
+                assert(program->instructions[i]->args[0] == op->args[0]);
                 push_onto_stack(stack, i);
                 break;
             case OP_END:
-                open_ptr = pop_from(stack);
-                pointed_op = program->instructions[open_ptr];
+                op_pointer = pop_from(stack);
+                // printf("OP_POINTER : %lld\n", op_pointer);
+                // if ((uint64) op_pointer >= program->instructions_len)
+                    // break;
+                pointed_op = program->instructions[op_pointer];
                 if (pointed_op->op_code == OP_IF || pointed_op->op_code == OP_ELSE) {
-                    // `end` points in itself.
-                    program->instructions[i]->args[0] = pointed_op->args[0];
-                    // Makes either `if` or `else` pointing to the `end` block.
+                    // The block closed by `end` points to it.
                     pointed_op->args[0] = i;
+                    if (debug->debug_bindings)
+                        debug_binding(pointed_op, op_pointer, OP_CODES[op->op_code], i);
+                    assert(program->instructions[op_pointer]->args[0] == pointed_op->args[0]);
+                    // `end` points to the next instruction.
+                    op->args[0] = i;
+                    assert(program->instructions[i]->args[0] == op->args[0]);
+                    if (debug->debug_bindings)
+                        debug_binding(op, i, OP_CODES[program->instructions[op->args[0]]->op_code], op->args[0]);
                 } else if (pointed_op->op_code == OP_DO) {
                     // `end` points to `while`.
-                    program->instructions[i]->args[0] = pointed_op->args[0];
-                    // Making `do` pointing the `end` block.
+                    op->args[0] = pointed_op->args[0];
+                    assert(program->instructions[i]->args[0] == op->args[0]);
+                    if (debug->debug_bindings)
+                        debug_binding(op, i, OP_CODES[program->instructions[op->args[0]]->op_code], op->args[0]);
+                    // `do` points now to the `end` block.
                     pointed_op->args[0] = i;
+                    assert(program->instructions[op_pointer]->args[0] == pointed_op->args[0]);
+                    if (debug->debug_bindings)
+                        debug_binding(pointed_op, op_pointer, OP_CODES[op->op_code], i);
                 } else {
                     printf("ERROR: `end` : block was not opened neither by `if` nor `else` nor `while`.\n");
                     exit(1);
@@ -113,15 +119,24 @@ program_t *new_program(tokens_t *tokens)
     program->instructions = (inst_t **) calloc(tokens->tokens_len, sizeof(inst_t *));
     for (; i < tokens->tokens_len; i++)
         program->instructions[i] = tokens->tokens[i]->instruction;
-    return preprocess_program(program);
+    return program;
 }
 
-int run_program(program_t *self, int sim, debugger_t debug, char const *output)
+void clear_memory(unsigned char fake_mem[])
+{
+    uint64 i = 0;
+
+    for (; i < MEMORY_CAPACITY; i++)
+        fake_mem[i] = 0;
+}
+
+int run_program(program_t *self, int sim, debugger_t const *debug, char const *output)
 {
     int err = 0;
     FILE* f = 0;
     uint64 i = 0;
     inst_t *op = 0;
+    int64 tmp_ptr = 0;
     stack_t *stack = 0;
     int64 poped = 0;
     int exit_found = 0;
@@ -141,9 +156,10 @@ int run_program(program_t *self, int sim, debugger_t debug, char const *output)
         f = open_file(output, "w");
         asm_header(f);
     }
-    if (debug.enabled)
-        debug_program(self);
-    if (sim && debug.enabled && debug.debug_stack)
+    clear_memory(fake_mem);
+    self = preprocess_program(self, debug);
+    debug_program(self);
+    if (sim && debug->enabled && debug->debug_stack)
         debug_stack(stack, 0);
     for (; i < self->instructions_len && !exit_found; i++) {
         op = self->instructions[i];
@@ -193,43 +209,48 @@ int run_program(program_t *self, int sim, debugger_t debug, char const *output)
                 inst_loet(f, stack);
                 break;
             case OP_IF:
+                tmp_ptr = op->args[0];
                 // `preprocess_program` must be called.
-                assert(op->args[0] >= 0);
-                // Invalid `if` end pointer.
-                assert((uint64) op->args[0] < self->instructions_len);
-                if (inst_if(f, stack, op->args[0], self->instructions[op->args[0] - 1]->op_code == OP_ELSE) && sim)
-                    i = op->args[0] - 1;
+                assert(tmp_ptr > 0);
+                if (inst_if(f, stack, tmp_ptr, self->instructions[tmp_ptr - 1]->op_code) && sim) {
+                    if (debug->debug_jumps)
+                        debug_jump(self, op, i, tmp_ptr);
+                    i = tmp_ptr - 1; // - 1 to avoid the ++ of the for loop
+                }
                 break;
             case OP_ELSE:
+                tmp_ptr = op->args[0];
                 // `preprocess_program` must be called.
-                assert(op->args[0] >= 0);
-                // Invalid `else` end pointer.
-                assert((uint64) op->args[0] < self->instructions_len);
+                assert(tmp_ptr > 0);
+                assert(self->instructions[tmp_ptr]->op_code == OP_END);
                 if (!sim)
-                    inst_else(f, op->args[0] + 1);
+                    inst_else(f, tmp_ptr);
                 else
-                    i = op->args[0];
+                    i = tmp_ptr - 1; // To avoid the ++ of the for loop.
                 break;
             case OP_WHILE:
                 if (!sim)
                     inst_while(f);
                 break;
             case OP_DO:
+                tmp_ptr = op->args[0];
                 // `preprocess_program` must be called.
-                assert(op->args[0] >= 0);
-                // Invalid `end` pointer.
-                assert((uint64) op->args[0] <= self->instructions_len);
-                if (inst_do(f, stack, op->args[0] + 1) && sim)
-                    i = op->args[0];
+                assert(tmp_ptr > 0);
+                if (inst_do(f, stack, tmp_ptr) && sim) {
+                    if (debug->debug_jumps)
+                        debug_jump(self, op, i, tmp_ptr);
+                    i = tmp_ptr; // We want to jump to the `end` + 1, no need to substract because of for loop.
+                }
                 break;
             case OP_END:
-                assert(op->args[0] >= 0);
-                // Invalid `end` pointer.
-                assert((uint64) op->args[0] <= self->instructions_len);
+                tmp_ptr = op->args[0];
                 if (!sim)
-                    inst_end(f, op->args[0]);
-                else
-                    i = op->args[0];
+                    inst_end(f, tmp_ptr + 1);
+                else {
+                    if (debug->debug_jumps)
+                        debug_jump(self, op, i, tmp_ptr);
+                    i = tmp_ptr - 1; // To avoid the ++ of the for loop.
+                }
                 break;
             case OP_MEM:
                 inst_mem(f, stack);
@@ -280,11 +301,11 @@ int run_program(program_t *self, int sim, debugger_t debug, char const *output)
                 assert(0);
                 break;
         }
-        if (debug.enabled && sim) {
-            if (debug.debug_stack)
+        if (debug->enabled && sim) {
+            if (debug->debug_stack)
                 debug_stack(stack, op);
-            if (debug.debug_memory)
-                debug_memory(fake_mem, debug.mem_lim);
+            if (debug->debug_memory)
+                debug_memory(fake_mem, debug->mem_lim);
         }
     }
     if (!sim) {

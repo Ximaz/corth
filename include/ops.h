@@ -55,9 +55,8 @@ typedef struct op_s {
 } op_t;
 
 static char *const OP_CODES[] = {
-
     "OP_PUSH",
-    "OP_POP"
+    "OP_POP",
     "OP_PLUS",
     "OP_MINUS",
     "OP_DUMP",
@@ -87,7 +86,7 @@ static char *const OP_CODES[] = {
     "OP_SHL",
     "OP_SHR",
     "OP_ORB",
-    "OP_ANDB",
+    "OP_ANDB"
 };
 
 inst_t *push(int64 n);

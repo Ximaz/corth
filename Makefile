@@ -17,7 +17,6 @@ valgrind: $(NAME)
 
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(CORTH_LIB)
-	make clean
 
 $(OBJ): src/libcorth.a
 	$(CC) $(CFLAGS) -c $(SRC) $(CORTH_LIB)

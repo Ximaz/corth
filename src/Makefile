@@ -8,7 +8,6 @@ all: $(NAME)
 
 $(NAME): $(OBJ)
 	ar rc $(NAME) $(OBJ)
-	make clean
 
 $(OBJ): $(SRC)
 	$(CC) $(CFLAGS) -c $(SRC)

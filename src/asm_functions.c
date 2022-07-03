@@ -333,9 +333,10 @@ void inst_loet(FILE *f, stack_t *stack)
     }
 }
 
-int inst_if(FILE *f, stack_t *stack, uint64 end_addr, int is_else)
+int inst_if(FILE *f, stack_t *stack, uint64 end_addr, op_code_t op_code)
 {
     assert(f || stack);
+    assert(op_code == OP_ELSE || op_code == OP_END);
     int64 n1 = 0;
 
     if (stack) {
@@ -345,8 +346,8 @@ int inst_if(FILE *f, stack_t *stack, uint64 end_addr, int is_else)
     if (f) {
         fprintf(f, "    ;; -- IF --\n");
         fprintf(f, "    pop rax\n");
-        fprintf(f, "    test rax, rax\n");
-        fprintf(f, "    ;; -- GOTO %s --\n", is_else ? "ELSE" : "END");
+        fprintf(f, "    test al, al\n");
+        fprintf(f, "    ;; -- GOTO %s --\n", OP_CODES[op_code]);
         fprintf(f, "    jz addr_%llu\n", end_addr);
     }
     return 0;
@@ -356,7 +357,7 @@ void inst_else(FILE *f, uint64 end_addr)
 {
     assert(f);
     fprintf(f, "    ;; -- GOTO END --\n");
-    fprintf(f, "    jmp addr_%llu\n", end_addr);
+    fprintf(f, "    jmp addr_%llu\n", end_addr + 1); // + 1 to go after the `end` block.
     fprintf(f, ";; -- ELSE --\n");
 }
 
@@ -378,9 +379,9 @@ int inst_do(FILE *f, stack_t *stack, uint64 end_addr)
     if (f) {
         fprintf(f, "    ;; -- DO --\n");
         fprintf(f, "    pop rax\n");
-        fprintf(f, "    test rax, rax\n");
+        fprintf(f, "    test al, al\n");
         fprintf(f, "    ;; -- GOTO END --\n");
-        fprintf(f, "    jz addr_%llu\n", end_addr);
+        fprintf(f, "    jz addr_%llu\n", end_addr + 1); // + 1 to go to the `end` + 1 instruction.
     }
     return 0;
 }
