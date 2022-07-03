@@ -10,7 +10,7 @@
 #include "../include/file_handler.h"
 #include "../include/asm_functions.h"
 
-static program_t *preprocess_program(program_t *program, debugger_t const *debug)
+static tokens_t *preprocess_program(tokens_t *program, debugger_t const *debug)
 {
     uint64 i = 0;
     inst_t *op = 0;
@@ -22,8 +22,8 @@ static program_t *preprocess_program(program_t *program, debugger_t const *debug
     stack_t *stack = new_stack();
 
     assert(COUNT_OPS == 35);
-    for (; i < program->instructions_len; i++) {
-        op = program->instructions[i];
+    for (; i < program->tokens_len; i++) {
+        op = program->tokens[i]->instruction;
         switch (op->op_code) {
             // `if` will have to point either to itself or an `else` address.
             case OP_IF:
@@ -35,7 +35,7 @@ static program_t *preprocess_program(program_t *program, debugger_t const *debug
                 // The `ìf` address.
                 op_pointer = pop_from(stack).ptr;
                 // The `if` instruction.
-                pointed_op = program->instructions[op_pointer];
+                pointed_op = program->tokens[op_pointer]->instruction;
                 // `else` can only be used in `if` blocks.
                 assert(pointed_op->op_code == OP_IF);
                 // `if` will points to the next instruction after `else`.
@@ -45,7 +45,7 @@ static program_t *preprocess_program(program_t *program, debugger_t const *debug
                 if (debug->debug_bindings)
                     debug_binding(pointed_op, op_pointer, "else next instruction", i + 1);
                 pointed_op->args[0].ptr = i + 1;
-                assert(program->instructions[op_pointer]->args[0].ptr == pointed_op->args[0].ptr);
+                assert(program->tokens[op_pointer]->instruction->args[0].ptr == pointed_op->args[0].ptr);
                 // The `else` instruction points to itself for now.
                 op->args[0].ptr = i;
                 push_onto_stack(stack, op->args[0]);
@@ -60,13 +60,13 @@ static program_t *preprocess_program(program_t *program, debugger_t const *debug
                 // The `while` address.
                 op_pointer = pop_from(stack).ptr;
                 // The `while` instruction.
-                pointed_op = program->instructions[op_pointer];
+                pointed_op = program->tokens[op_pointer]->instruction;
                 assert(pointed_op->op_code == OP_WHILE);
                 // `do` now points to the `while` block.
                 if (debug->debug_bindings)
                     debug_binding(op, i, OP_CODES[pointed_op->op_code], op_pointer);
                 op->args[0].ptr = op_pointer;
-                assert(program->instructions[i]->args[0].ptr == op->args[0].ptr);
+                assert(program->tokens[i]->instruction->args[0].ptr == op->args[0].ptr);
                 clear_arg(&tmp_arg);
                 tmp_arg.ptr = i;
                 push_onto_stack(stack, tmp_arg);
@@ -74,29 +74,29 @@ static program_t *preprocess_program(program_t *program, debugger_t const *debug
             case OP_END:
                 op_pointer = pop_from(stack).ptr;
                 // printf("OP_POINTER : %lld\n", op_pointer);
-                // if ((uint64) op_pointer >= program->instructions_len)
+                // if ((uint64) op_pointer >= program->tokens_len)
                     // break;
-                pointed_op = program->instructions[op_pointer];
+                pointed_op = program->tokens[op_pointer]->instruction;
                 if (pointed_op->op_code == OP_IF || pointed_op->op_code == OP_ELSE) {
                     // The block closed by `end` points to it.
                     pointed_op->args[0].ptr = i;
                     if (debug->debug_bindings)
                         debug_binding(pointed_op, op_pointer, OP_CODES[op->op_code], i);
-                    assert(program->instructions[op_pointer]->args[0].ptr == pointed_op->args[0].ptr);
+                    assert(program->tokens[op_pointer]->instruction->args[0].ptr == pointed_op->args[0].ptr);
                     // `end` points to the next instruction.
                     op->args[0].ptr = i;
-                    assert(program->instructions[i]->args[0].ptr == op->args[0].ptr);
+                    assert(program->tokens[i]->instruction->args[0].ptr == op->args[0].ptr);
                     if (debug->debug_bindings)
-                        debug_binding(op, i, OP_CODES[program->instructions[op->args[0].ptr]->op_code], op->args[0].ptr);
+                        debug_binding(op, i, OP_CODES[program->tokens[op->args[0].ptr]->instruction->op_code], op->args[0].ptr);
                 } else if (pointed_op->op_code == OP_DO) {
                     // `end` points to `while`.
                     op->args[0].ptr = pointed_op->args[0].ptr;
-                    assert(program->instructions[i]->args[0].ptr == op->args[0].ptr);
+                    assert(program->tokens[i]->instruction->args[0].ptr == op->args[0].ptr);
                     if (debug->debug_bindings)
-                        debug_binding(op, i, OP_CODES[program->instructions[op->args[0].ptr]->op_code], op->args[0].ptr);
+                        debug_binding(op, i, OP_CODES[program->tokens[op->args[0].ptr]->instruction->op_code], op->args[0].ptr);
                     // `do` points now to the `end` block.
                     pointed_op->args[0].ptr = i;
-                    assert(program->instructions[op_pointer]->args[0].ptr == pointed_op->args[0].ptr);
+                    assert(program->tokens[op_pointer]->instruction->args[0].ptr == pointed_op->args[0].ptr);
                     if (debug->debug_bindings)
                         debug_binding(pointed_op, op_pointer, OP_CODES[op->op_code], i);
                 } else {
@@ -114,23 +114,6 @@ static program_t *preprocess_program(program_t *program, debugger_t const *debug
     return program;
 }
 
-program_t *new_program(tokens_t *tokens)
-{
-    size_t i = 0;
-    program_t *program = 0;
-
-    if (!tokens)
-        return program;
-    program = (program_t *)malloc(sizeof(program_t));
-    if (!program)
-        return program;
-    program->instructions_len = tokens->tokens_len;
-    program->instructions = (inst_t **) calloc(tokens->tokens_len, sizeof(inst_t *));
-    for (; i < tokens->tokens_len; i++)
-        program->instructions[i] = tokens->tokens[i]->instruction;
-    return program;
-}
-
 void clear_memory(unsigned char fake_mem[])
 {
     uint64 i = 0;
@@ -139,7 +122,7 @@ void clear_memory(unsigned char fake_mem[])
         fake_mem[i] = 0;
 }
 
-int run_program(program_t *self, int sim, debugger_t const *debug, char const *output)
+int run_program(tokens_t *self, int sim, debugger_t const *debug, char const *output)
 {
     int err = 0;
     FILE* f = 0;
@@ -165,13 +148,15 @@ int run_program(program_t *self, int sim, debugger_t const *debug, char const *o
         f = open_file(output, "w");
         asm_header(f);
     }
+    if (debug->debug_tokens)
+        debug_tokens(self);
     clear_memory(fake_mem);
     self = preprocess_program(self, debug);
     // debug_program(self);
     if (sim && debug->enabled && debug->debug_stack)
         debug_stack(stack, 0);
-    for (; i < self->instructions_len && !exit_found; i++) {
-        op = self->instructions[i];
+    for (; i < self->tokens_len && !exit_found; i++) {
+        op = self->tokens[i]->instruction;
         if (!sim)
             fprintf(f, "addr_%lld:\n", i);
         switch (op->op_code) {
@@ -222,7 +207,7 @@ int run_program(program_t *self, int sim, debugger_t const *debug, char const *o
                 tmp_ptr = op->args[0].ptr;
                 // `preprocess_program` must be called.
                 assert(tmp_ptr > 0);
-                if (inst_if(f, stack, tmp_ptr, self->instructions[tmp_ptr - 1]->op_code) && sim) {
+                if (inst_if(f, stack, tmp_ptr, self->tokens[tmp_ptr - 1]->instruction->op_code) && sim) {
                     if (debug->debug_jumps)
                         debug_jump(self, op, i, tmp_ptr);
                     i = tmp_ptr - 1; // - 1 to avoid the ++ of the for loop
@@ -232,7 +217,7 @@ int run_program(program_t *self, int sim, debugger_t const *debug, char const *o
                 tmp_ptr = op->args[0].ptr;
                 // `preprocess_program` must be called.
                 assert(tmp_ptr > 0);
-                assert(self->instructions[tmp_ptr]->op_code == OP_END);
+                assert(self->tokens[tmp_ptr]->instruction->op_code == OP_END);
                 if (!sim)
                     inst_else(f, tmp_ptr);
                 else
@@ -331,14 +316,4 @@ int run_program(program_t *self, int sim, debugger_t const *debug, char const *o
         fclose(f);
     }
     return err;
-}
-
-void destroy_program(program_t *self)
-{
-    uint64 i = 0;
-
-    for (; i < self->instructions_len; i++)
-        free(self->instructions[i]);
-    free(self->instructions);
-    free(self);
 }

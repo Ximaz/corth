@@ -66,15 +66,15 @@ void debug_memory(unsigned char *fake_mem, uint64 limit)
     printf("]\n");
 }
 
-void debug_program(program_t *self)
+void debug_program(tokens_t *self)
 {
     uint64 i = 0;
     uint64 j = 0;
     inst_t *op = 0;
     inst_arg_t arg;
 
-    for (; i < self->instructions_len; i++) {
-        op = self->instructions[i];
+    for (; i < self->tokens_len; i++) {
+        op = self->tokens[i]->instruction;
         printf("%llu: %s", i, OP_CODES[op->op_code]);
         if (op->args_len > 0) {
             printf(": ");
@@ -96,19 +96,32 @@ void debug_program(program_t *self)
             }
             j = 0;
         }
-        if (i < self->instructions_len - 1)
+        if (i < self->tokens_len - 1)
             printf(",");
         printf("\n");
     }
 }
 
-void debug_jump(program_t *self, inst_t *op, uint64 op_addr, uint64 jmp_addr)
+void debug_jump(tokens_t *self, inst_t *op, uint64 op_addr, uint64 jmp_addr)
 {
-    printf("JUMP IS TAKEN : from %s (at %lld) to %s (at %lld)\n", OP_CODES[op->op_code], op_addr, OP_CODES[self->instructions[jmp_addr]->op_code], jmp_addr);
+    printf("JUMP IS TAKEN : from %s (at %lld) to %s (at %lld)\n", OP_CODES[op->op_code], op_addr, OP_CODES[self->tokens[jmp_addr]->instruction->op_code], jmp_addr);
 }
 
 void debug_binding(inst_t *src, uint64 srci, char const *dest, uint64 desti)
 {
     char const *binding_str = "BINDING : %s (at %lld) -> %s (at %llu)\n";
     printf(binding_str, OP_CODES[src->op_code], srci, dest, desti);
+}
+
+void debug_tokens(tokens_t *self)
+{
+    uint64 inst_i = 0;
+    token_t *token = 0;
+    inst_t *inst = 0;
+
+    for (; inst_i < self->tokens_len; inst_i++) {
+        token = self->tokens[inst_i];
+        inst = token->instruction;
+        printf("TOKEN : { type: \"%s\", location: \"%s:%llu:%llu\", instruction: \"%s\"}\n", TOKEN_TYPES[token->type], token->filename, token->row, token->col, OP_CODES[inst->op_code]);
+    }
 }

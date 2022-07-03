@@ -12,6 +12,7 @@ typedef struct debugger_s
     int debug_memory;
     int debug_bindings;
     int debug_jumps;
+    int debug_tokens;
 } debugger_t;
 
 typedef union inst_arg_u
@@ -22,13 +23,18 @@ typedef union inst_arg_u
     int statement; // For boolean tokens.
 } inst_arg_t;
 
-typedef enum inst_type_e
+typedef enum token_type_e
 {
     TOKEN_ID,
     TOKEN_INT,
-    TOKEN_STR,
-    TOKEN_BOOL,
-    TOKEN_PTR,
-} inst_type_t;
+    TOKEN_WORD,
+    COUNT_TYPES
+} token_type_t;
+
+static char *const TOKEN_TYPES[] = {
+    "TOKEN_ID",
+    "TOKEN_INT",
+    "TOKEN_WORD",
+};
 
 #endif

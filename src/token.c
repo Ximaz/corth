@@ -38,12 +38,14 @@ static inst_t *parse_token(token_t *token, char *word)
     if (word[i] == 0) {
         if (i <= 19) {
             n = strtoll(word, 0, 10);
+            token->type = TOKEN_INT;
             return push(n);
         }
         if (errno == ERANGE)
             token_error("number wont fit into int64 bits", token, word);
         token_error("number wont fit into int64 bits (might be a uint64 error)", token, word);
     }
+    token->type = TOKEN_WORD;
     return string(word);
 }
 
@@ -59,6 +61,7 @@ token_t *new_token(char const *filename, uint64 row, uint64 col, char *word)
     token->row = row;
     token->col = col;
     token->filename = filename;
+    token->type = TOKEN_ID;
     token->instruction = parse_token(token, word);
     return token;
 }

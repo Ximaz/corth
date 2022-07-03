@@ -47,7 +47,6 @@ typedef struct inst_s
     op_code_t op_code;
     uint64 args_len;
     inst_arg_t *args;
-    inst_type_t type;
 } inst_t;
 
 // This struct must be used only for tokens

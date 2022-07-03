@@ -3,7 +3,6 @@
 #include "ops.h"
 #include "types.h"
 
-
 typedef struct token_s
 {
     // Where does the token come from ?
@@ -12,6 +11,7 @@ typedef struct token_s
     char const *filename;
     // The token properties :
     inst_t *instruction;
+    token_type_t type;
 } token_t;
 
 typedef struct tokens_s

@@ -11,7 +11,6 @@ static inst_t *new_op(op_code_t op_code, uint64 argc)
         return inst;
     inst->op_code = op_code;
     inst->args_len = argc;
-    inst->type = TOKEN_ID;
     inst->args = argc == 0 ? 0 : (inst_arg_t *) calloc(argc, sizeof(inst_arg_t));
     return inst;
 }
@@ -29,7 +28,6 @@ inst_t *push(int64 n)
     inst_t *inst = new_op(OP_PUSH, 1);
 
     if (inst) {
-        inst->type = TOKEN_INT;
         clear_arg(&inst->args[0]);
         inst->args[0].integer = n;
     }
@@ -42,7 +40,6 @@ inst_t *string(char *s)
     inst_t *inst = new_op(OP_STRING, 1);
 
     if (inst) {
-        inst->type = TOKEN_STR;
         clear_arg(&inst->args[0]);
         inst->args[0].word = s;
     }
@@ -113,7 +110,6 @@ inst_t *iff(void)
     inst_t *inst = new_op(OP_IF, 1);
 
     if (inst) {
-        inst->type = TOKEN_PTR;
         inst->args[0].ptr = -1; // Invalid pointer to `end`.
     }
     return inst;
@@ -124,7 +120,6 @@ inst_t *elsee(void)
     inst_t *inst = new_op(OP_ELSE, 1);
 
     if (inst) {
-        inst->type = TOKEN_PTR;
         inst->args[0].ptr = -1; // Invalid pointer to `end`.
     }
     return inst;
@@ -140,7 +135,6 @@ inst_t *doo(void)
     inst_t *inst = new_op(OP_DO, 1);
 
     if (inst) {
-        inst->type = TOKEN_PTR;
         inst->args[0].ptr = -1; // Invalid pointer to either `end` or `end` + 1.
     }
     return inst;
@@ -151,7 +145,6 @@ inst_t *end(void)
     inst_t *inst = new_op(OP_END, 1);
 
     if (inst) {
-        inst->type = TOKEN_PTR;
         inst->args[0].ptr = -1; // Invalid pointer to `while`.
     }
     return inst;
