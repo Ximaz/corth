@@ -4,9 +4,10 @@
 #include <stdio.h>
 #include "types.h"
 
-#define STRING_CAPACITY 4096ULL
-#define MEMORY_CAPACITY STRING_CAPACITY + 4096ULL
+#define STRING_CAPACITY 640000ULL
+#define MEMORY_CAPACITY 640000ULL
 
+char *unescape(char *string);
 void asm_dump(FILE *f);
 void asm_header(FILE *f);
 void asm_footer(FILE *f);

@@ -8,6 +8,53 @@
 #include "../include/stack.h"
 #include "../include/asm_functions.h"
 
+char *unescape(char *string)
+{
+    size_t i = 0;
+    size_t j = 0;
+    size_t str_len = strlen(string);
+    char *escaped = (char *) calloc(str_len + 1, sizeof(char));
+
+    for (; i <= str_len; i++) {
+        if (string[i] == '\\') {
+            switch(string[i + 1]) {
+             case '\\':
+                escaped[j] = '\\';
+                break;
+             case 'a':
+                escaped[j] = '\a';
+                break;
+             case 'b':
+                escaped[j] = '\b';
+                break;
+             case 't':
+                escaped[j] = '\t';
+                break;
+             case 'n':
+                escaped[j] = '\n';
+                break;
+             case 'v':
+                escaped[j] = '\v';
+                break;
+             case 'f':
+                escaped[j] = '\f';
+                break;
+             case 'r':
+                escaped[j] = '\r';
+                break;
+            }
+            i++;
+        } else {
+            escaped[j] = string[i];
+        }
+        j++;
+    }
+    escaped[j] = 0;
+    string = strncpy(string, escaped, j);
+    free(escaped);
+    return string;
+}
+
 void asm_dump(FILE *f)
 {
     fprintf(f, ";; -- DUMP --\n");
@@ -72,6 +119,7 @@ void asm_footer(FILE *f)
     fprintf(f, "segment .bss\n");
     // OPS_MAP[OP_MEM - 2].word because OP_PUSH and OP_STRING are not supported.
     fprintf(f, "%s: resb %llu\n", BUILTINS[OP_MEM - 2].word, MEMORY_CAPACITY);
+    fprintf(f, "segment .data\n");
 }
 
 void inst_push(FILE *f, stack_t *stack, int64 n)
@@ -84,7 +132,7 @@ void inst_push(FILE *f, stack_t *stack, int64 n)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- PUSH --\n");
+        fprintf(f, "    ;; -- PUSH INT --\n");
         fprintf(f, "    push %lld\n", n);
     }
 }
@@ -103,8 +151,9 @@ void inst_string(FILE *f, stack_t *stack, uint64 str_addr, op_t *op)
         push_onto_stack(stack, val);
     }
     if (f) {
-        // NOT IMPLEMENTED YET
-        assert(0);
+        fprintf(f, "    ;; -- PUSH STR --\n");
+        fprintf(f, "    push %lu\n", strlen(op->val.string));
+        fprintf(f, "    push str_%llu\n", str_addr);
     }
 }
 
@@ -515,7 +564,7 @@ int inst_syscall(FILE *f, stack_t *stack, char *fake_mem, unsigned int vals_len)
             rsi = pop_from(stack).integer;
             rdx = pop_from(stack).integer;
             if (rax == 1) {
-                write(rdi, &fake_mem[rsi], rdx);
+                write(rdi, unescape(&fake_mem[rsi]), rdx);
                 return 256;
             } else {
                 // NOT IMPLEMENTED YET !
