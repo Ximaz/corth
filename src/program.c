@@ -17,8 +17,10 @@ static void destroy_program(program_t *self)
 
     if (!self)
         return;
-    for (; i < self->ops_len; i++) {
-        free(self->ops[i]);
+    if (self->ops) {
+        for (; i < self->ops_len; i++)
+            free(self->ops[i]);
+        free(self->ops);
     }
     free(self);
 }

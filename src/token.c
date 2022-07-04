@@ -67,11 +67,11 @@ token_t *new_token(location_t token_loc, token_type_t token_type, value_t val)
 
 void destroy_token(token_t *self)
 {
-    if (self) {
-        if (self->type == TOKEN_STR)
-            free(self->val.string);
-        free(self);
-    }
+    if (!self)
+        return;
+    if (self->type == TOKEN_STR || self->type == TOKEN_WORD)
+        free(self->val.string);
+    free(self);
 }
 
 token_list_t *new_tokens(void)
