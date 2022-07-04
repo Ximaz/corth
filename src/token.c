@@ -8,80 +8,74 @@
 #include "../include/types.h"
 #include "../include/token.h"
 
-static void token_error(char const *error, token_t *token, char *word)
+static void token_error(char const *error, token_t *token)
 {
-    printf("%s:%llu:%llu: %s: \"%s\"\n", token->filename, token->row, token->col, error, word);
+    printf("%s:%llu:%llu: %s: \"%s\"\n", token->loc.filename, token->loc.row, token->loc.col, error, token->val.string);
     exit(1);
 }
 
-static inst_t *find_inst(char *word)
+static op_type_t find_op_type(char *word)
 {
     uint64 i = 0;
 
-    // COUNT_OPS - 2 : The OPS_MAP doesn't contain all ops, especially
-    // those which take params such as `OP_STRING` and `OP_PUSH`.
-    for (; i < COUNT_OPS - 2; i++)
-        if (strcmp(OPS_MAP[i].word, word) == 0)
-            return OPS_MAP[i].func();
-    return 0;
+    for (; i < COUNT_OPS; i++)
+        if (strcmp(BUILTINS[i].word, word) == 0)
+            return BUILTINS[i].type;
+    return COUNT_OPS;
 }
 
-static inst_t *parse_token(token_t *token, char *word)
+op_t *compile_token_to_op(token_t *self)
 {
-    assert(COUNT_TOKENS == 2);
-    int64 n = 0;
-    uint64 i = 0;
-    inst_t *inst = find_inst(word);
+    assert(COUNT_TOKENS == 3);
+    op_t *op = malloc(sizeof(op_t));
 
-    if (inst)
-        return inst;
-    while (word[i] >= '0' && word[i] <= '9') i++;
-    if (word[i] == 0) {
-        if (i <= 19) {
-            n = strtoll(word, 0, 10);
-            token->type = TOKEN_INT;
-            return push(n);
+    if (!op)
+        return op;
+    if (self->type == TOKEN_WORD) {
+        op->type = find_op_type(self->val.string);
+        if (op->type == COUNT_OPS) {
+            free(op);
+            token_error("unknowned word", self);
         }
-        if (errno == ERANGE)
-            token_error("number wont fit into int64 bits", token, word);
-        token_error("number wont fit into int64 bits (might be a uint64 error)", token, word);
+    } else if (self->type == TOKEN_INT)
+        op->type = OP_PUSH_INT;
+    else if(self->type == TOKEN_STR)
+        op->type = OP_PUSH_STR;
+    else {
+        free(op);
+        token_error("unexpected error", self);
     }
-    token_error("invalid keyword", token, word);
-    return 0;
+    op->val = self->val;
+    op->loc = self->loc;
+    op->jmp = -1;
+    return op;
 }
 
-token_t *new_token(char const *filename, uint64 row, uint64 col, char *word)
+token_t *new_token(location_t token_loc, token_type_t token_type, value_t val)
 {
     token_t *token = 0;
 
-    if (!word)
-        return token;
     token = (token_t *) malloc(sizeof(token_t));
     if (!token)
         return token;
-    token->row = row;
-    token->col = col;
-    token->filename = filename;
-    token->type = TOKEN_WORD;
-    token->instruction = parse_token(token, word);
+    token->loc = token_loc;
+    token->type = token_type;
+    token->val = val;
     return token;
 }
 
 void destroy_token(token_t *self)
 {
     if (self) {
-        if (self->instruction) {
-            if (self->instruction->args)
-                free(self->instruction->args);
-            free(self->instruction);
-        }
+        if (self->type == TOKEN_STR)
+            free(self->val.string);
         free(self);
     }
 }
 
-tokens_t *new_tokens(void)
+token_list_t *new_tokens(void)
 {
-    tokens_t *tokens = (tokens_t *)malloc(sizeof(tokens_t));
+    token_list_t *tokens = (token_list_t *)malloc(sizeof(token_list_t));
 
     if (!tokens)
         return tokens;
@@ -90,7 +84,7 @@ tokens_t *new_tokens(void)
     return tokens;
 }
 
-void push_token(tokens_t *self, token_t *token)
+void push_token(token_list_t *self, token_t *token)
 {
     if (!self || !self->tokens)
         return;
@@ -98,7 +92,7 @@ void push_token(tokens_t *self, token_t *token)
     self->tokens = (token_t **) realloc(self->tokens, (self->tokens_len + 1) * sizeof(token_t *));
 }
 
-void destroy_tokens(tokens_t *self)
+void destroy_tokens(token_list_t *self)
 {
     uint64 i = 0;
 

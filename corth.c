@@ -66,7 +66,7 @@ static debugger_t *build_debugger(int argc, char *const *argv)
 int main(int argc, char *const *argv)
 {
     int err = 0;
-    tokens_t *tokens = 0;
+    token_list_t *tokens = 0;
     debugger_t *debug = 0;
     char const *filename = 0;
     char const *subcommand = 0;
@@ -84,7 +84,7 @@ int main(int argc, char *const *argv)
     }
     subcommand = argv[1];
     filename = argv[2];
-    tokens = lex_from_file(filename);
+    tokens = lex_file(filename);
     debug = build_debugger(argc, argv);
     if (strcmp(subcommand, "sim") == 0) {
         err = run_program(tokens, 1, debug, 0);
@@ -99,6 +99,5 @@ int main(int argc, char *const *argv)
         printf("ERROR: Invalid subcommand is provided.\n");
         err = 1;
     }
-    destroy_tokens(tokens);
     return err;
 }

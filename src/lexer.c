@@ -1,4 +1,6 @@
+#include <errno.h>
 #include <stdio.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -7,11 +9,18 @@
 #include "../include/lexer.h"
 #include "../include/file_handler.h"
 
-static size_t trim_line(char *token, size_t col)
+static size_t run_to_get(char *line, size_t start, char predicated)
 {
-    while (col < strlen(token) && token[col] <= ' ')
-        col++;
-    return col;
+    while (start < strlen(line) && line[start] != predicated)
+        start++;
+    return start;
+}
+
+static size_t run_to_avoid(char *line, size_t start, char predicated)
+{
+    while (start < strlen(line) && line[start] == predicated)
+        start++;
+    return start;
 }
 
 static char *strip_end_of_line(char *line)
@@ -25,33 +34,69 @@ static char *strip_end_of_line(char *line)
     return line;
 }
 
-tokens_t *lex_from_line(char const *filename, char *line, uint64 line_i, tokens_t *tokens)
+static token_list_t *lex_line(char const *filename, char *line, uint64 line_i, token_list_t *tokens)
 {
-    size_t i = trim_line(line, 0);
-    char *word = 0;
     token_t *token = 0;
+    location_t token_loc = {
+        .row = line_i,
+        .filename = filename,
+        .col = 0
+    };
+    size_t col_end = 0;
+    size_t col = run_to_avoid(line, 0, ' ');
+    size_t line_len = strlen(line);
+    char *word = (char *) calloc(line_len, sizeof(char));
+    char *num_checkpoint = 0;
+    int64 num = 0;
+    value_t val;
 
-    line = strip_end_of_line(line);
-    word = strtok(line, " ");
-    while (word && strncmp(word, COMMENT, 2) != 0) {
-        token = new_token(filename, line_i, i, word);
-        i += strlen(word) + 1;
+    while (col < line_len) {
+        token_loc.col = col;
+        if (strncmp(&line[col], COMMENT, 2) == 0)
+            break;
+        if (line[col] == '"') {
+            col_end = run_to_get(line, col + 1, '"');
+            assert(line[col_end] == '"');
+            word = strncpy(word, &line[col + 1], col_end);
+            val.string = strdup(word);
+            token = new_token(token_loc, TOKEN_STR, val);
+            col = run_to_avoid(line, col_end + 1, ' ');
+        } else {
+            col_end = run_to_get(line, col, ' ');
+            word = strncpy(word, &line[col], col_end - col);
+            word[col_end - col] = 0;
+            num_checkpoint = word;
+            num = strtoll(word, &num_checkpoint, 10);
+            // Unable to convert the number, it's not a number.
+            if (num_checkpoint == word || *num_checkpoint != '\0' ||
+                ((num == LLONG_MIN || num == LLONG_MAX) && errno == ERANGE)) {
+                val.string = strdup(word);
+                token = new_token(token_loc, TOKEN_WORD, val);
+            }
+            else {
+                val.integer = num;
+                token = new_token(token_loc, TOKEN_INT, val);
+            }
+            col = run_to_avoid(line, col_end, ' ');
+        }
         push_token(tokens, token);
-        word = strtok(0, " ");
     }
+    free(word);
     return tokens;
 }
 
-tokens_t *lex_from_file(char const *filename)
+token_list_t *lex_file(char const *filename)
 {
     char *line = 0;
     size_t line_len = 0;
     uint64 line_number = 1;
     FILE *f = open_file(filename, "r");
-    tokens_t *tokens = new_tokens();
+    token_list_t *tokens = new_tokens();
 
-    while (getline(&line, &line_len, f) > 0)
-        tokens = lex_from_line(filename, line, line_number++, tokens);
+    while (getline(&line, &line_len, f) > 0) {
+        line = strip_end_of_line(line);
+        tokens = lex_line(filename, line, line_number++, tokens);
+    }
     free(line);
     fclose(f);
     return tokens;

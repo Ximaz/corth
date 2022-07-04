@@ -5,7 +5,6 @@
 #include "../include/ops.h"
 #include "../include/types.h"
 #include "../include/stack.h"
-#include "../include/debugger.h"
 #include "../include/asm_functions.h"
 
 void asm_dump(FILE *f)
@@ -71,18 +70,17 @@ void asm_footer(FILE *f)
     fprintf(f, "    syscall\n");
     fprintf(f, "segment .bss\n");
     // OPS_MAP[OP_MEM - 2].word because OP_PUSH and OP_STRING are not supported.
-    fprintf(f, "%s: resb %llu\n", OPS_MAP[OP_MEM - 2].word, MEMORY_CAPACITY);
+    fprintf(f, "%s: resb %llu\n", BUILTINS[OP_MEM - 2].word, MEMORY_CAPACITY);
 }
 
 void inst_push(FILE *f, stack_t *stack, int64 n)
 {
     assert(f || stack);
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
-        arg.integer = n;
-        push_onto_stack(stack, arg);
+        val.integer = n;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- PUSH --\n");
@@ -93,12 +91,11 @@ void inst_push(FILE *f, stack_t *stack, int64 n)
 void inst_string(FILE *f, stack_t *stack, char *s)
 {
     assert(f || stack);
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
-        arg.word = s;
-        push_onto_stack(stack, arg);
+        val.string = s;
+        push_onto_stack(stack, val);
     }
     if (f) {
         // NOT IMPLEMENTED YET
@@ -106,10 +103,10 @@ void inst_string(FILE *f, stack_t *stack, char *s)
     }
 }
 
-inst_arg_t inst_pop(FILE *f, stack_t *stack)
+value_t inst_pop(FILE *f, stack_t *stack)
 {
     assert(f || stack);
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
         return pop_from(stack);
@@ -118,8 +115,8 @@ inst_arg_t inst_pop(FILE *f, stack_t *stack)
         fprintf(f, "    ;; -- POP --\n");
         fprintf(f, "    pop rdi\n");
     }
-    clear_arg(&arg);
-    return arg;
+    val.integer = 0;
+    return val;
 }
 
 void inst_plus(FILE *f, stack_t *stack)
@@ -127,14 +124,13 @@ void inst_plus(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0;
     int64 n2 = 0;
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n1 = pop_from(stack).integer;
         n2 = pop_from(stack).integer;
-        arg.integer = n1 + n2;
-        push_onto_stack(stack, arg);
+        val.integer = n1 + n2;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- PLUS --\n");
@@ -150,14 +146,13 @@ void inst_minus(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0;
     int64 n2 = 0;
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n1 = pop_from(stack).integer;
         n2 = pop_from(stack).integer;
-        arg.integer = n2 - n1;
-        push_onto_stack(stack, arg);
+        val.integer = n2 - n1;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- MINUS --\n");
@@ -187,12 +182,12 @@ void inst_dump(FILE *f, stack_t *stack)
 void inst_dupp(FILE *f, stack_t *stack)
 {
     assert(f || stack);
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        arg = pop_from(stack);
-        push_onto_stack(stack, arg);
-        push_onto_stack(stack, arg);
+        val = pop_from(stack);
+        push_onto_stack(stack, val);
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- DUP --\n");
@@ -205,16 +200,16 @@ void inst_dupp(FILE *f, stack_t *stack)
 void inst_2dupp(FILE *f, stack_t *stack)
 {
     assert(f || stack);
-    inst_arg_t arg1;
-    inst_arg_t arg2;
+    value_t val1;
+    value_t val2;
 
     if (stack) {
-        arg1 = pop_from(stack);
-        arg2 = pop_from(stack);
-        push_onto_stack(stack, arg2);
-        push_onto_stack(stack, arg1);
-        push_onto_stack(stack, arg2);
-        push_onto_stack(stack, arg1);
+        val1 = pop_from(stack);
+        val2 = pop_from(stack);
+        push_onto_stack(stack, val2);
+        push_onto_stack(stack, val1);
+        push_onto_stack(stack, val2);
+        push_onto_stack(stack, val1);
     }
     if (f) {
         fprintf(f, "    ;; -- 2DUP --\n");
@@ -232,14 +227,13 @@ void inst_equal(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0;
     int64 n2 = 0;
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n1 = pop_from(stack).integer;
         n2 = pop_from(stack).integer;
-        arg.statement = n1 == n2;
-        push_onto_stack(stack, arg);
+        val.integer = n1 == n2;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- EQUAL --\n");
@@ -258,14 +252,13 @@ void inst_diff(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0;
     int64 n2 = 0;
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n1 = pop_from(stack).integer;
         n2 = pop_from(stack).integer;
-        arg.statement = n1 != n2;
-        push_onto_stack(stack, arg);
+        val.integer = n1 != n2;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- DIFF --\n");
@@ -284,14 +277,13 @@ void inst_gt(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0;
     int64 n2 = 0;
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n1 = pop_from(stack).integer;
         n2 = pop_from(stack).integer;
-        arg.statement = n2 > n1;
-        push_onto_stack(stack, arg);
+        val.integer = n2 > n1;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- GREATER THAN --\n");
@@ -309,14 +301,13 @@ void inst_lt(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0;
     int64 n2 = 0;
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n1 = pop_from(stack).integer;
         n2 = pop_from(stack).integer;
-        arg.statement = n2 < n1;
-        push_onto_stack(stack, arg);
+        val.integer = n2 < n1;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- LESS THAN --\n");
@@ -334,14 +325,13 @@ void inst_goet(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0;
     int64 n2 = 0;
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n1 = pop_from(stack).integer;
         n2 = pop_from(stack).integer;
-        arg.statement = n2 >= n1;
-        push_onto_stack(stack, arg);
+        val.integer = n2 >= n1;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- GREATER OR EQUAL THAN --\n");
@@ -359,14 +349,13 @@ void inst_loet(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0;
     int64 n2 = 0;
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n1 = pop_from(stack).integer;
         n2 = pop_from(stack).integer;
-        arg.statement = n2 <= n1;
-        push_onto_stack(stack, arg);
+        val.integer = n2 <= n1;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- LESS OR EQUAL THAN --\n");
@@ -379,10 +368,10 @@ void inst_loet(FILE *f, stack_t *stack)
     }
 }
 
-int inst_if(FILE *f, stack_t *stack, uint64 end_addr, op_code_t op_code)
+int inst_if(FILE *f, stack_t *stack, uint64 end_addr, op_type_t op_type)
 {
     assert(f || stack);
-    assert(op_code == OP_ELSE || op_code == OP_END);
+    assert(op_type == OP_ELSE || op_type == OP_END);
     int64 n1 = 0;
 
     if (stack) {
@@ -393,7 +382,7 @@ int inst_if(FILE *f, stack_t *stack, uint64 end_addr, op_code_t op_code)
         fprintf(f, "    ;; -- IF --\n");
         fprintf(f, "    pop rax\n");
         fprintf(f, "    test al, al\n");
-        fprintf(f, "    ;; -- GOTO %s --\n", OP_CODES[op_code]);
+        fprintf(f, "    ;; -- GOTO %s --\n", OP_CODES[op_type]);
         fprintf(f, "    jz addr_%llu\n", end_addr);
     }
     return 0;
@@ -443,12 +432,11 @@ void inst_end(FILE *f, uint64 next_addr)
 void inst_mem(FILE *f, stack_t *stack)
 {
     assert(f || stack);
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
-        arg.ptr = 0;
-        push_onto_stack(stack, arg);
+        val.integer = 0;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- MEM --\n");
@@ -461,11 +449,9 @@ void inst_store(FILE *f, stack_t *stack, unsigned char *fake_mem)
     assert(f || stack);
     uint64 byte = 0;
     int64 address = 0;
-
-
     if (stack) {
         byte = pop_from(stack).integer;
-        address = pop_from(stack).ptr;
+        address = pop_from(stack).integer;
         fake_mem[address] = byte % 0xFF; // Only pushes the lowest bytes of the value, as in assembly.
     }
     if (f) {
@@ -481,14 +467,13 @@ void inst_load(FILE *f, stack_t *stack, unsigned char *fake_mem)
     assert(f || stack);
     uint64 byte = 0;
     int64 address = 0;
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
-        address = pop_from(stack).ptr;
+        address = pop_from(stack).integer;
         byte = fake_mem[address];
-        arg.integer = byte;
-        push_onto_stack(stack, arg);
+        val.integer = byte;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- LOAD --\n");
@@ -499,10 +484,10 @@ void inst_load(FILE *f, stack_t *stack, unsigned char *fake_mem)
     }
 }
 
-int inst_syscall(FILE *f, stack_t *stack, unsigned char *fake_mem, unsigned int args_len)
+int inst_syscall(FILE *f, stack_t *stack, unsigned char *fake_mem, unsigned int vals_len)
 {
     assert(f || stack);
-    assert(args_len <= 6);
+    assert(vals_len <= 6);
     int64 rax = 0;
     int64 rdi = 0;
     int64 rsi = 0;
@@ -512,14 +497,14 @@ int inst_syscall(FILE *f, stack_t *stack, unsigned char *fake_mem, unsigned int 
     // int64 r9 = 0; // Unused yet.
 
     if (stack) {
-        if (args_len == 2) {
+        if (vals_len == 2) {
             rax = pop_from(stack).integer;
             rdi = pop_from(stack).integer;
             if (rax == 60) {
                 return rdi % 256;
             }
         }
-        if (args_len == 3) {
+        if (vals_len == 3) {
             rax = pop_from(stack).integer;
             rdi = pop_from(stack).integer;
             rsi = pop_from(stack).integer;
@@ -538,18 +523,18 @@ int inst_syscall(FILE *f, stack_t *stack, unsigned char *fake_mem, unsigned int 
     if (f) {
         fprintf(f, "    ;; -- SYSCALL --\n");
         fprintf(f, "    pop rax ; the syscall_id\n");
-        if (args_len >= 1)
-            fprintf(f, "    pop rdi ; 1st arg of the syscall\n");
-        if (args_len >= 2)
-            fprintf(f, "    pop rsi ; 2nd arg of the syscall\n");
-        if (args_len >= 3)
-            fprintf(f, "    pop rdx ; 3rd arg of the syscall\n");
-        if (args_len >= 4)
-            fprintf(f, "    pop r10 ; 4th arg of the syscall\n");
-        if (args_len >= 5)
-            fprintf(f, "    pop r8  ; 5th arg of the syscall\n");
-        if (args_len == 6)
-            fprintf(f, "    pop r9  ; 6th arg of the syscall\n");
+        if (vals_len >= 1)
+            fprintf(f, "    pop rdi ; 1st val of the syscall\n");
+        if (vals_len >= 2)
+            fprintf(f, "    pop rsi ; 2nd val of the syscall\n");
+        if (vals_len >= 3)
+            fprintf(f, "    pop rdx ; 3rd val of the syscall\n");
+        if (vals_len >= 4)
+            fprintf(f, "    pop r10 ; 4th val of the syscall\n");
+        if (vals_len >= 5)
+            fprintf(f, "    pop r8  ; 5th val of the syscall\n");
+        if (vals_len == 6)
+            fprintf(f, "    pop r9  ; 6th val of the syscall\n");
         fprintf(f, "    syscall\n");
     }
     return 256;
@@ -560,14 +545,13 @@ void inst_shl(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0; // shifter
     int64 n2 = 0; // shifted
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n1 = pop_from(stack).integer;
         n2 = pop_from(stack).integer;
-        arg.integer = n2 << n1;
-        push_onto_stack(stack, arg);
+        val.integer = n2 << n1;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- SHL --\n");
@@ -583,14 +567,13 @@ void inst_shr(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0; // shifter
     int64 n2 = 0; // shifted
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n1 = pop_from(stack).integer;
         n2 = pop_from(stack).integer;
-        arg.integer = n2 >> n1;
-        push_onto_stack(stack, arg);
+        val.integer = n2 >> n1;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- SHR --\n");
@@ -606,14 +589,13 @@ void inst_orb(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0;
     int64 n2 = 0;
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n2 = pop_from(stack).integer;
         n1 = pop_from(stack).integer;
-        arg.integer = n1 | n2;
-        push_onto_stack(stack, arg);
+        val.integer = n1 | n2;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- OR --\n");
@@ -629,14 +611,13 @@ void inst_andb(FILE *f, stack_t *stack)
     assert(f || stack);
     int64 n1 = 0;
     int64 n2 = 0;
-    inst_arg_t arg;
+    value_t val;
 
     if (stack) {
-        clear_arg(&arg);
         n2 = pop_from(stack).integer;
         n1 = pop_from(stack).integer;
-        arg.integer = n1 & n2;
-        push_onto_stack(stack, arg);
+        val.integer = n1 & n2;
+        push_onto_stack(stack, val);
     }
     if (f) {
         fprintf(f, "    ;; -- AND --\n");
@@ -650,14 +631,14 @@ void inst_andb(FILE *f, stack_t *stack)
 void inst_swap(FILE *f, stack_t *stack)
 {
     assert(f || stack);
-    inst_arg_t arg1;
-    inst_arg_t arg2;
+    value_t val1;
+    value_t val2;
 
     if (stack) {
-        arg1 = pop_from(stack);
-        arg2 = pop_from(stack);
-        push_onto_stack(stack, arg1);
-        push_onto_stack(stack, arg2);
+        val1 = pop_from(stack);
+        val2 = pop_from(stack);
+        push_onto_stack(stack, val1);
+        push_onto_stack(stack, val2);
     }
     if (f) {
         fprintf(f, "    ;; -- SWAP --\n");
@@ -671,15 +652,15 @@ void inst_swap(FILE *f, stack_t *stack)
 void inst_over(FILE *f, stack_t *stack)
 {
     assert(f || stack);
-    inst_arg_t arg1;
-    inst_arg_t arg2;
+    value_t val1;
+    value_t val2;
 
     if (stack) {
-        arg2 = pop_from(stack);
-        arg1 = pop_from(stack);
-        push_onto_stack(stack, arg1);
-        push_onto_stack(stack, arg2);
-        push_onto_stack(stack, arg1);
+        val2 = pop_from(stack);
+        val1 = pop_from(stack);
+        push_onto_stack(stack, val1);
+        push_onto_stack(stack, val2);
+        push_onto_stack(stack, val1);
     }
     if (f) {
         fprintf(f, "    ;; -- OVER --\n");

@@ -1,8 +1,4 @@
-//|board             |                   |
-// ^
-// mem
-
-mem 98 + 1 store
+         mem 98 + 1 store
 
 0 while dup 98 < do
    0 while dup 100 < do
