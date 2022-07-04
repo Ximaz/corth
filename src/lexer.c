@@ -45,11 +45,13 @@ static token_list_t *lex_line(char const *filename, char *line, uint64 line_i, t
     size_t col_end = 0;
     size_t col = run_to_avoid(line, 0, ' ');
     size_t line_len = strlen(line);
-    char *word = (char *) calloc(line_len, sizeof(char));
+    char *word = (char *) calloc(line_len + 1, sizeof(char));
     char *num_checkpoint = 0;
     int64 num = 0;
     value_t val;
 
+    if (!line)
+        return tokens;
     while (col < line_len) {
         token_loc.col = col;
         if (strncmp(&line[col], COMMENT, 2) == 0)

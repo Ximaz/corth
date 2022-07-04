@@ -68,6 +68,7 @@ int main(int argc, char *const *argv)
     int err = 0;
     token_list_t *tokens = 0;
     debugger_t *debug = 0;
+    char *output = "output.asm";
     char const *filename = 0;
     char const *subcommand = 0;
     char const *binary_name = argv[0];
@@ -84,6 +85,8 @@ int main(int argc, char *const *argv)
     }
     subcommand = argv[1];
     filename = argv[2];
+    if (argc > 3)
+        output = argv[3];
     tokens = lex_file(filename);
     debug = build_debugger(argc, argv);
     if (strcmp(subcommand, "sim") == 0) {
@@ -91,7 +94,7 @@ int main(int argc, char *const *argv)
         free(debug);
     }
     else if (strcmp(subcommand, "com") == 0) {
-        err = run_program(tokens, 0, debug, "output.asm");
+        err = run_program(tokens, 0, debug, output);
         free(debug);
     }
     else {

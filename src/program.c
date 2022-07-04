@@ -355,11 +355,11 @@ int run_program(token_list_t *self, int sim, debugger_t const *debug, char const
     if (!sim) {
         fprintf(f, "addr_%lld:\n", i);
         asm_footer(f);
-        for (--str_index; str_index >= 0; str_index--) {
+        printf("%llu\n", str_index);
+        for (--str_index; str_index > 0; str_index--) {
             fprintf(f, "str_%llu: db `%s`, 0\n", str_index, fake_strings[str_index]);
             free(fake_strings[str_index]);
         }
-        free(fake_strings);
         fclose(f);
 
     }
