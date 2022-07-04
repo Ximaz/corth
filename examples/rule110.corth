@@ -1,23 +1,23 @@
-         mem 98 + 1 store
+mem 162 + 1 store
 
-0 while dup 98 < do
-   0 while dup 100 < do
+0 while dup 162 < do
+   0 while dup 164 < do
       dup mem + load if
-         dup mem + 100 + 42 store
+         dup mem + 164 + 42 store
       else
-         dup mem + 100 + 32 store
+         dup mem + 164 + 32 store
       end
       1 +
    end
-   mem + 100 + 10 store
-   101 mem 100 + 1 1 syscall3
+   mem + 164 + 10 store
+   165 mem 164 + 1 1 syscall3
 
    // pattern
    mem     load 1 shl
    mem 1 + load
    orb
 
-   1 while dup 98 < do
+   1 while dup 162 < do
       swap 1 shl 7 andb
       over mem + 1 + load orb
       2dup 110 swap shr 1 andb
