@@ -1,0 +1,12 @@
+34 35 + 69 != if
+    "Test 1 didn't pass.\n" 1 1 syscall3
+end
+500 80 - 420 != if
+    "Test 2 didn't pass.\n" 1 1 syscall3
+end
+10 20 + 30 != if
+    "Test 3 didn't pass.\n" 1 1 syscall3
+end
+10 20 - 0 = 0 != if
+    "Test 4 didn't pass.\n" 1 1 syscall3
+end
