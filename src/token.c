@@ -47,7 +47,8 @@ op_t *compile_token_to_op(token_t *self)
     }
     op->val = self->val;
     op->loc = self->loc;
-    op->jmp = -1;
+    op->jmp = -1;  // The block has nowhere to jump yet, -1 is set.
+    op->addr = -1; // The address has not been pushed yet, -1 is set.
     return op;
 }
 

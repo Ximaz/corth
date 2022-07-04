@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include "../include/ops.h"
 #include "../include/types.h"
@@ -88,13 +89,17 @@ void inst_push(FILE *f, stack_t *stack, int64 n)
     }
 }
 
-void inst_string(FILE *f, stack_t *stack, char *s)
+void inst_string(FILE *f, stack_t *stack, uint64 str_addr, op_t *op)
 {
     assert(f || stack);
     value_t val;
 
     if (stack) {
-        val.string = s;
+        val.integer = strlen(op->val.string);
+        push_onto_stack(stack, val);
+        if (op->addr == -1)
+            op->addr = str_addr;
+        val.integer = op->addr;
         push_onto_stack(stack, val);
     }
     if (f) {
@@ -435,7 +440,7 @@ void inst_mem(FILE *f, stack_t *stack)
     value_t val;
 
     if (stack) {
-        val.integer = 0;
+        val.integer = STRING_CAPACITY; // Get the pointer to the beginning of the memory.
         push_onto_stack(stack, val);
     }
     if (f) {
@@ -444,7 +449,7 @@ void inst_mem(FILE *f, stack_t *stack)
     }
 }
 
-void inst_store(FILE *f, stack_t *stack, unsigned char *fake_mem)
+void inst_store(FILE *f, stack_t *stack, char *fake_mem)
 {
     assert(f || stack);
     uint64 byte = 0;
@@ -462,7 +467,7 @@ void inst_store(FILE *f, stack_t *stack, unsigned char *fake_mem)
     }
 }
 
-void inst_load(FILE *f, stack_t *stack, unsigned char *fake_mem)
+void inst_load(FILE *f, stack_t *stack, char *fake_mem)
 {
     assert(f || stack);
     uint64 byte = 0;
@@ -484,7 +489,7 @@ void inst_load(FILE *f, stack_t *stack, unsigned char *fake_mem)
     }
 }
 
-int inst_syscall(FILE *f, stack_t *stack, unsigned char *fake_mem, unsigned int vals_len)
+int inst_syscall(FILE *f, stack_t *stack, char *fake_mem, unsigned int vals_len)
 {
     assert(f || stack);
     assert(vals_len <= 6);

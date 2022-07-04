@@ -97,7 +97,10 @@ typedef struct op_s
     // In case of `if` it's the place of else branch, in case of
     // `else` it's the end of the construction, etc. Default value
     // will be -1, which marks it as unset.
-    uint64 jmp;
+    int64 jmp;
+    // Exists only for the op OP_PUSH_STR. It contains the address
+    // where the string was pushed in the memory.
+    int64 addr;
 } op_t;
 
 // Types for tokens :

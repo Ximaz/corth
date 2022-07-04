@@ -20,6 +20,10 @@ void debug_stack(stack_t *stack, op_t *op)
 
     if (!op)
         return;
+    if (stack_cursor == 0) {
+        printf("Stack is empty\n");
+        return;
+    }
     printf("|");
     for (padding_i = 0; padding_i < display; padding_i++)
         printf("-");
@@ -43,7 +47,7 @@ void debug_stack(stack_t *stack, op_t *op)
     }
 }
 
-void debug_memory(unsigned char *fake_mem, uint64 limit)
+void debug_memory(char *fake_mem, uint64 limit)
 {
     uint64 i = 0;
     uint64 range = limit <= MEMORY_CAPACITY ? limit : MEMORY_CAPACITY;
@@ -97,7 +101,7 @@ void debug_tokens(token_list_t *self)
         if (token->type == TOKEN_INT) {
             printf(", .val = %lld", token->val.integer);
         } else if (token->type == TOKEN_STR || token->type == TOKEN_WORD)
-            printf(", .val = %s", token->val.string);
+            printf(", .val = \"%s\"", token->val.string);
         printf(" }\n");
     }
 }

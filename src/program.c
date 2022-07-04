@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 #include "../include/ops.h"
 #include "../include/types.h"
 #include "../include/stack.h"
@@ -13,6 +14,7 @@
 static program_t *compile_program(token_list_t *tokens)
 {
     uint64 cursor = 0;
+    token_t *token = 0;
     program_t *program = (program_t *) malloc(sizeof(program_t));
 
     if (!program)
@@ -20,7 +22,12 @@ static program_t *compile_program(token_list_t *tokens)
     program->ops_len = tokens->tokens_len;
     program->ops = (op_t **)calloc(program->ops_len, sizeof(op_t *));
     for (; cursor < program->ops_len; cursor++) {
-        program->ops[cursor] = compile_token_to_op(tokens->tokens[cursor]);
+        token = tokens->tokens[cursor];
+        program->ops[cursor] = compile_token_to_op(token);
+        if (token->type == TOKEN_STR) {
+            program->ops[cursor]->val.string = strdup(token->val.string);
+        } else if (token->type == TOKEN_INT)
+            program->ops[cursor]->val.integer = token->val.integer;
     }
     destroy_tokens(tokens);
     return program;
@@ -130,7 +137,7 @@ static program_t *preprocess_program(program_t *self, debugger_t const *debug)
     return self;
 }
 
-void clear_memory(unsigned char fake_mem[])
+void clear_memory(char fake_mem[])
 {
     uint64 i = 0;
 
@@ -145,11 +152,12 @@ int run_program(token_list_t *self, int sim, debugger_t const *debug, char const
     uint64 i = 0;
     op_t *op = 0;
     int64 tmp_ptr = 0;
+    int exit_found = 0;
     stack_t *stack = 0;
     program_t *program = 0;
-    // inst_arg_t poped;
-    int exit_found = 0;
-    unsigned char fake_mem[MEMORY_CAPACITY];
+    uint64 str_len = 0;
+    uint64 str_size = 0;
+    char fake_mem[MEMORY_CAPACITY];
 
     assert(COUNT_OPS == 35);
     if (!self)
@@ -165,11 +173,9 @@ int run_program(token_list_t *self, int sim, debugger_t const *debug, char const
         f = open_file(output, "w");
         asm_header(f);
     }
-    if (debug->enabled && debug->debug_tokens)
-        debug_tokens(self);
-    if (debug->enabled && debug->debug_tokens)
-        debug_tokens(self);
     clear_memory(fake_mem);
+    if (debug->enabled && debug->debug_tokens)
+        debug_tokens(self);
     program = preprocess_program(compile_program(self), debug);
     for (; i < program->ops_len && !exit_found; i++) {
         op = program->ops[i];
@@ -180,7 +186,14 @@ int run_program(token_list_t *self, int sim, debugger_t const *debug, char const
                 inst_push(f, stack, op->val.integer);
                 break;
             case OP_PUSH_STR:
-                inst_string(f, stack, op->val.string);
+                str_len = strlen(op->val.string);
+                inst_string(f, stack, str_size, op);
+                strncpy(fake_mem + str_size, op->val.string, str_len);
+                str_size += str_len;
+                if (str_size > STRING_CAPACITY) {
+                    printf("String buffer overflow !\n");
+                    exit(1);
+                }
                 break;
             case OP_POP:
                 // For now, poped won't do anthing else than poping.

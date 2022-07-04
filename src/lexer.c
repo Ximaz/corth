@@ -34,6 +34,53 @@ static char *strip_end_of_line(char *line)
     return line;
 }
 
+static char *unescape(char *string)
+{
+    size_t i = 0;
+    size_t j = 0;
+    size_t str_len = strlen(string);
+    char *escaped = (char *) calloc(str_len + 1, sizeof(char));
+
+    for (; i <= str_len; i++) {
+        if (string[i] == '\\') {
+            switch(string[i + 1]) {
+             case '\\':
+                escaped[j] = '\\';
+                break;
+             case 'a':
+                escaped[j] = '\a';
+                break;
+             case 'b':
+                escaped[j] = '\b';
+                break;
+             case 't':
+                escaped[j] = '\t';
+                break;
+             case 'n':
+                escaped[j] = '\n';
+                break;
+             case 'v':
+                escaped[j] = '\v';
+                break;
+             case 'f':
+                escaped[j] = '\f';
+                break;
+             case 'r':
+                escaped[j] = '\r';
+                break;
+            }
+            i++;
+        } else {
+            escaped[j] = string[i];
+        }
+        j++;
+    }
+    escaped[j] = 0;
+    string = strncpy(string, escaped, j);
+    free(escaped);
+    return string;
+}
+
 static token_list_t *lex_line(char const *filename, char *line, uint64 line_i, token_list_t *tokens)
 {
     token_t *token = 0;
@@ -57,7 +104,8 @@ static token_list_t *lex_line(char const *filename, char *line, uint64 line_i, t
         if (line[col] == '"') {
             col_end = run_to_get(line, col + 1, '"');
             assert(line[col_end] == '"');
-            word = strncpy(word, &line[col + 1], col_end);
+            word = strncpy(word, &line[col + 1], col_end - 1);
+            word = unescape(word);
             val.string = strdup(word);
             token = new_token(token_loc, TOKEN_STR, val);
             col = run_to_avoid(line, col_end + 1, ' ');
