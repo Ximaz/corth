@@ -11,8 +11,21 @@
 #include "../include/file_handler.h"
 #include "../include/asm_functions.h"
 
+static void destroy_program(program_t *self)
+{
+    uint64 i = 0;
+
+    if (!self)
+        return;
+    for (; i < self->ops_len; i++) {
+        free(self->ops[i]);
+    }
+    free(self);
+}
+
 static program_t *compile_program(token_list_t *tokens)
 {
+    op_t *op = 0;
     uint64 cursor = 0;
     token_t *token = 0;
     program_t *program = (program_t *) malloc(sizeof(program_t));
@@ -23,13 +36,18 @@ static program_t *compile_program(token_list_t *tokens)
     program->ops = (op_t **)calloc(program->ops_len, sizeof(op_t *));
     for (; cursor < program->ops_len; cursor++) {
         token = tokens->tokens[cursor];
-        program->ops[cursor] = compile_token_to_op(token);
+        op = compile_token_to_op(token);
+        if (!op)
+            break;
         if (token->type == TOKEN_STR) {
-            program->ops[cursor]->val.string = strdup(token->val.string);
-        } else if (token->type == TOKEN_INT)
-            program->ops[cursor]->val.integer = token->val.integer;
+            op->val.string = token->val.string;
+            op->val_is_str = 1;
+        } else if (token->type == TOKEN_INT) {
+            op->val.integer = token->val.integer;
+            op->val_is_str = 0;
+        }
+        program->ops[cursor] = op;
     }
-    destroy_tokens(tokens);
     return program;
 }
 
@@ -159,7 +177,7 @@ int run_program(token_list_t *self, int sim, debugger_t const *debug, char const
     uint64 fake_str_len = 0;
     char fake_mem[STRING_CAPACITY + MEMORY_CAPACITY];
     int64 str_index = 0;
-    char **fake_strings;
+    char **fake_strings = 0;
 
     assert(COUNT_OPS == 35);
     if (!self)
@@ -172,7 +190,6 @@ int run_program(token_list_t *self, int sim, debugger_t const *debug, char const
     else {
         // Output must be specified for compilation.
         assert(output);
-        fake_strings = (char **) calloc(1, sizeof(char *));
         f = open_file(output, "w");
         asm_header(f);
     }
@@ -190,15 +207,14 @@ int run_program(token_list_t *self, int sim, debugger_t const *debug, char const
                 break;
             case OP_PUSH_STR:
                 inst_string(f, stack, str_index, op);
+                fake_str_len = strlen(op->val.string);
                 if (sim) {
-                    fake_str_len = strlen(op->val.string);
                     op->val.string = unescape(op->val.string);
                     strncpy(fake_mem + fake_str_i, op->val.string, fake_str_len);
                     fake_str_i += fake_str_len;
-
                 } else {
-                    fake_strings[str_index++] = strdup(op->val.string);
-                    fake_strings = (char **) realloc(fake_strings, str_index);
+                    fake_strings = (char **) realloc(fake_strings, (str_index + 1) * sizeof(char *));
+                    fake_strings[str_index++] = strndup(op->val.string, fake_str_len);
                 }
                 if (fake_str_i > STRING_CAPACITY && sim) {
                     free(fake_strings);
@@ -356,14 +372,16 @@ int run_program(token_list_t *self, int sim, debugger_t const *debug, char const
         fprintf(f, "addr_%lld:\n", i);
         asm_footer(f);
         printf("%llu\n", str_index);
-        for (--str_index; str_index > 0; str_index--) {
+        for (; str_index >= 0; str_index--) {
             fprintf(f, "str_%llu: db `%s`, 0\n", str_index, fake_strings[str_index]);
             free(fake_strings[str_index]);
         }
+        free(fake_strings);
         fclose(f);
 
     }
     if (sim)
         destroy_stack(stack);
+    destroy_program(program);
     return err;
 }

@@ -92,12 +92,16 @@ int main(int argc, char *const *argv)
     if (strcmp(subcommand, "sim") == 0) {
         err = run_program(tokens, 1, debug, 0);
         free(debug);
+        destroy_tokens(tokens);
     }
     else if (strcmp(subcommand, "com") == 0) {
         err = run_program(tokens, 0, debug, output);
         free(debug);
+        destroy_tokens(tokens);
     }
     else {
+        free(debug);
+        destroy_tokens(tokens);
         usage(argv[0]);
         printf("ERROR: Invalid subcommand is provided.\n");
         err = 1;

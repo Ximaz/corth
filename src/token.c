@@ -27,9 +27,9 @@ static op_type_t find_op_type(char *word)
 op_t *compile_token_to_op(token_t *self)
 {
     assert(COUNT_TOKENS == 3);
-    op_t *op = malloc(sizeof(op_t));
+    op_t *op = (op_t *) malloc(sizeof(op_t));
 
-    if (!op)
+    if (!self || !op)
         return op;
     if (self->type == TOKEN_WORD) {
         op->type = find_op_type(self->val.string);

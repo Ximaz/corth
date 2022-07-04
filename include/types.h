@@ -88,9 +88,11 @@ typedef struct op_s
     op_type_t type;
     location_t loc;
     // Exists only for type OP_PUSH_INT or OP_PUSH_STR.
-    // Contains the value // that needs to be pushed onto
+    // Contains the value that needs to be pushed onto
     // the stack.
     value_t val;
+    // Required when it time to free the op.
+    int val_is_str;
     // Exists only for ops like `if`, `else`, `while`, etc.
     // Contains an index of an op within the program that the
     // execution has to jump to depending on the circumstantces.
