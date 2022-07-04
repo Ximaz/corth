@@ -1,17 +1,1 @@
-mem dup 72 store
-1 + dup 101 store
-1 + dup 108 store
-1 + dup 108 store
-1 + dup 111 store
-1 + dup 44 store
-1 + dup 32 store
-1 + dup 87 store
-1 + dup 111 store
-1 + dup 114 store
-1 + dup 108 store
-1 + dup 100 store
-1 + dup 32 store
-1 + dup 33 store
-1 + dup 10 store
-1 +
-mem - mem 1 1 syscall3
+"Hello, World!\n" 1 1 syscall3

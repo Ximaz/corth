@@ -45,6 +45,11 @@ This is what the language supports so far. **Since the language is a work in pro
 ```
 push(stack, <integer>)
 ```
+- `"<string>"` : pushes the string's length and then the string's address onto the stack.
+```
+push(stack, strlen(<string>))
+push(stack, &<string>)
+```
 - `pop` : pops the element at the top of the stack. (Not returned yet)
 ```
 pop(stack)
