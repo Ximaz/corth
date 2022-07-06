@@ -424,7 +424,7 @@ void inst_loet(FILE *f, corth_stack_t *stack)
 int inst_if(FILE *f, corth_stack_t *stack, uint64 end_addr, op_type_t op_type)
 {
     assert(f || stack);
-    // assert(op_type == OP_ELSE || op_type == OP_END);
+    assert(op_type == OP_ELSE || op_type == OP_END);
 
     if (stack)
         return (pop_from(stack).integer == 0);
