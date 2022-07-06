@@ -59,7 +59,7 @@ static program_t *preprocess_program(program_t *self, debugger_t const *debug)
     op_t *op = 0;
     int64 op_pointer = 0;
     op_t *pointed_op = 0;
-    stack_t *stack = new_stack();
+    corth_stack_t *stack = new_stack();
     value_t tmp_value;
 
     if (!stack)
@@ -173,7 +173,7 @@ int run_program(token_list_t *self, int sim, debugger_t const *debug, char const
     op_t *op = 0;
     int64 tmp_ptr = 0;
     int exit_found = 0;
-    stack_t *stack = 0;
+    corth_stack_t *stack = 0;
     program_t *program = 0;
     uint64 fake_str_i = 0;
     uint64 fake_str_len = 0;

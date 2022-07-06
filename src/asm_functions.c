@@ -122,7 +122,7 @@ void asm_footer(FILE *f)
     fprintf(f, "segment .data\n");
 }
 
-void inst_push(FILE *f, stack_t *stack, int64 n)
+void inst_push(FILE *f, corth_stack_t *stack, int64 n)
 {
     assert(f || stack);
     value_t val;
@@ -137,7 +137,7 @@ void inst_push(FILE *f, stack_t *stack, int64 n)
     }
 }
 
-void inst_string(FILE *f, stack_t *stack, uint64 str_addr, op_t *op)
+void inst_string(FILE *f, corth_stack_t *stack, uint64 str_addr, op_t *op)
 {
     assert(f || stack);
     value_t val;
@@ -157,7 +157,7 @@ void inst_string(FILE *f, stack_t *stack, uint64 str_addr, op_t *op)
     }
 }
 
-value_t inst_pop(FILE *f, stack_t *stack)
+value_t inst_pop(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     value_t val;
@@ -173,7 +173,7 @@ value_t inst_pop(FILE *f, stack_t *stack)
     return val;
 }
 
-void inst_plus(FILE *f, stack_t *stack)
+void inst_plus(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -195,7 +195,7 @@ void inst_plus(FILE *f, stack_t *stack)
     }
 }
 
-void inst_minus(FILE *f, stack_t *stack)
+void inst_minus(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -217,7 +217,7 @@ void inst_minus(FILE *f, stack_t *stack)
     }
 }
 
-void inst_dump(FILE *f, stack_t *stack)
+void inst_dump(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -233,7 +233,7 @@ void inst_dump(FILE *f, stack_t *stack)
     }
 }
 
-void inst_dupp(FILE *f, stack_t *stack)
+void inst_dupp(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     value_t val;
@@ -251,7 +251,7 @@ void inst_dupp(FILE *f, stack_t *stack)
     }
 }
 
-void inst_2dupp(FILE *f, stack_t *stack)
+void inst_2dupp(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     value_t val1;
@@ -276,7 +276,7 @@ void inst_2dupp(FILE *f, stack_t *stack)
     }
 }
 
-void inst_equal(FILE *f, stack_t *stack)
+void inst_equal(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -301,7 +301,7 @@ void inst_equal(FILE *f, stack_t *stack)
     }
 }
 
-void inst_diff(FILE *f, stack_t *stack)
+void inst_diff(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -326,7 +326,7 @@ void inst_diff(FILE *f, stack_t *stack)
     }
 }
 
-void inst_gt(FILE *f, stack_t *stack)
+void inst_gt(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -350,7 +350,7 @@ void inst_gt(FILE *f, stack_t *stack)
     }
 }
 
-void inst_lt(FILE *f, stack_t *stack)
+void inst_lt(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -374,7 +374,7 @@ void inst_lt(FILE *f, stack_t *stack)
     }
 }
 
-void inst_goet(FILE *f, stack_t *stack)
+void inst_goet(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -398,7 +398,7 @@ void inst_goet(FILE *f, stack_t *stack)
     }
 }
 
-void inst_loet(FILE *f, stack_t *stack)
+void inst_loet(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -422,7 +422,7 @@ void inst_loet(FILE *f, stack_t *stack)
     }
 }
 
-int inst_if(FILE *f, stack_t *stack, uint64 end_addr, op_type_t op_type)
+int inst_if(FILE *f, corth_stack_t *stack, uint64 end_addr, op_type_t op_type)
 {
     assert(f || stack);
     // assert(op_type == OP_ELSE || op_type == OP_END);
@@ -456,7 +456,7 @@ void inst_while(FILE *f)
     fprintf(f, "    ;; -- WHILE --\n");
 }
 
-int inst_do(FILE *f, stack_t *stack, uint64 end_addr)
+int inst_do(FILE *f, corth_stack_t *stack, uint64 end_addr)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -483,7 +483,7 @@ void inst_end(FILE *f, uint64 next_addr)
     fprintf(f, ";; -- END --\n");
 }
 
-void inst_mem(FILE *f, stack_t *stack)
+void inst_mem(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     value_t val;
@@ -498,7 +498,7 @@ void inst_mem(FILE *f, stack_t *stack)
     }
 }
 
-void inst_store(FILE *f, stack_t *stack, char *fake_mem)
+void inst_store(FILE *f, corth_stack_t *stack, char *fake_mem)
 {
     assert(f || stack);
     uint64 byte = 0;
@@ -516,7 +516,7 @@ void inst_store(FILE *f, stack_t *stack, char *fake_mem)
     }
 }
 
-void inst_load(FILE *f, stack_t *stack, char *fake_mem)
+void inst_load(FILE *f, corth_stack_t *stack, char *fake_mem)
 {
     assert(f || stack);
     uint64 byte = 0;
@@ -538,7 +538,7 @@ void inst_load(FILE *f, stack_t *stack, char *fake_mem)
     }
 }
 
-int inst_syscall(FILE *f, stack_t *stack, char *fake_mem, unsigned int vals_len)
+int inst_syscall(FILE *f, corth_stack_t *stack, char *fake_mem, unsigned int vals_len)
 {
     assert(f || stack);
     assert(vals_len <= 6);
@@ -594,7 +594,7 @@ int inst_syscall(FILE *f, stack_t *stack, char *fake_mem, unsigned int vals_len)
     return 256;
 }
 
-void inst_shl(FILE *f, stack_t *stack)
+void inst_shl(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0; // shifter
@@ -616,7 +616,7 @@ void inst_shl(FILE *f, stack_t *stack)
     }
 }
 
-void inst_shr(FILE *f, stack_t *stack)
+void inst_shr(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0; // shifter
@@ -638,7 +638,7 @@ void inst_shr(FILE *f, stack_t *stack)
     }
 }
 
-void inst_orb(FILE *f, stack_t *stack)
+void inst_orb(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -660,7 +660,7 @@ void inst_orb(FILE *f, stack_t *stack)
     }
 }
 
-void inst_andb(FILE *f, stack_t *stack)
+void inst_andb(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     int64 n1 = 0;
@@ -682,7 +682,7 @@ void inst_andb(FILE *f, stack_t *stack)
     }
 }
 
-void inst_swap(FILE *f, stack_t *stack)
+void inst_swap(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     value_t val1;
@@ -703,7 +703,7 @@ void inst_swap(FILE *f, stack_t *stack)
     }
 }
 
-void inst_over(FILE *f, stack_t *stack)
+void inst_over(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
     value_t val1;

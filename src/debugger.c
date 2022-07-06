@@ -8,7 +8,7 @@
 #include "../include/program.h"
 #include "../include/asm_functions.h"
 
-void debug_stack(stack_t *stack, op_t *op)
+void debug_stack(corth_stack_t *stack, op_t *op)
 {
     char buff[21];
     value_t val;

@@ -3,29 +3,29 @@
 #include "../include/stack.h"
 #include "../include/types.h"
 
-stack_t *new_stack(void)
+corth_stack_t *new_stack(void)
 {
-    stack_t *stack = (stack_t *) malloc(sizeof(stack_t));
+    corth_stack_t *stack = (corth_stack_t *) malloc(sizeof(corth_stack_t));
 
     if (stack) {
         stack->top = 0;
-        stack->elements = (value_t *) calloc(STACK_SIZE, sizeof(value_t));
+        stack->elements = (value_t *) calloc(corth_stack_sIZE, sizeof(value_t));
     }
     return stack;
 }
 
-void destroy_stack(stack_t *self)
+void destroy_stack(corth_stack_t *self)
 {
     free(self->elements);
     free(self);
 }
 
-void push_onto_stack(stack_t *self, value_t element)
+void push_onto_stack(corth_stack_t *self, value_t element)
 {
     self->elements[self->top++] = element;
 }
 
-value_t pop_from(stack_t *self)
+value_t pop_from(corth_stack_t *self)
 {
     if (self->top == 0) {
         printf("Stack is empty. Use debug_stack to see what happened.\n");

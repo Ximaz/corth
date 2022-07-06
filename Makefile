@@ -19,14 +19,14 @@ $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(CORTH_LIB)
 
 $(OBJ): src/libcorth.a
-	$(CC) $(CFLAGS) -c $(SRC) $(CORTH_LIB)
+	$(CC) $(CFLAGS) -c $(SRC)
 
 src/libcorth.a:
 	make -C src/
 
 asm_it:
-	nasm -felf64 -F dwarf -O0 output.asm -o output.o
-	ld output.o -o output -O0
+	nasm -felf64 -F dwarf output.asm -o output.o
+	ld output.o -o output
 
 clean:
 	rm -f $(OBJ) $(GDB_TMP_FILES) $(ASM_OUTPUT)

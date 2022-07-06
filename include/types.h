@@ -138,10 +138,10 @@ typedef struct program_s
 
 // Types for stacks :
 
-typedef struct stack_s
+typedef struct corth_stack_s
 {
     unsigned int top;
     value_t *elements;
-} stack_t;
+} corth_stack_t;
 
 #endif
