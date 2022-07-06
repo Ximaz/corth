@@ -162,9 +162,8 @@ value_t inst_pop(FILE *f, corth_stack_t *stack)
     assert(f || stack);
     value_t val;
 
-    if (stack) {
+    if (stack)
         return pop_from(stack);
-    }
     if (f) {
         fprintf(f, "    ;; -- POP --\n");
         fprintf(f, "    pop rdi\n");
@@ -426,12 +425,9 @@ int inst_if(FILE *f, corth_stack_t *stack, uint64 end_addr, op_type_t op_type)
 {
     assert(f || stack);
     // assert(op_type == OP_ELSE || op_type == OP_END);
-    int64 n1 = 0;
 
-    if (stack) {
-        n1 = pop_from(stack).integer;
-        return (n1 == 0);
-    }
+    if (stack)
+        return (pop_from(stack).integer == 0);
     if (f) {
         fprintf(f, "    ;; -- IF --\n");
         fprintf(f, "    pop rax\n");
@@ -459,12 +455,9 @@ void inst_while(FILE *f)
 int inst_do(FILE *f, corth_stack_t *stack, uint64 end_addr)
 {
     assert(f || stack);
-    int64 n1 = 0;
 
-    if (stack) {
-        n1 = pop_from(stack).integer;
-        return (n1 == 0);
-    }
+    if (stack)
+        return (pop_from(stack).integer == 0);
     if (f) {
         fprintf(f, "    ;; -- DO --\n");
         fprintf(f, "    pop rax\n");
@@ -503,6 +496,7 @@ void inst_store(FILE *f, corth_stack_t *stack, char *fake_mem)
     assert(f || stack);
     uint64 byte = 0;
     int64 address = 0;
+
     if (stack) {
         byte = pop_from(stack).integer;
         address = pop_from(stack).integer;
@@ -519,9 +513,9 @@ void inst_store(FILE *f, corth_stack_t *stack, char *fake_mem)
 void inst_load(FILE *f, corth_stack_t *stack, char *fake_mem)
 {
     assert(f || stack);
+    value_t val;
     uint64 byte = 0;
     int64 address = 0;
-    value_t val;
 
     if (stack) {
         address = pop_from(stack).integer;
@@ -597,9 +591,9 @@ int inst_syscall(FILE *f, corth_stack_t *stack, char *fake_mem, unsigned int val
 void inst_shl(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
+    value_t val;
     int64 n1 = 0; // shifter
     int64 n2 = 0; // shifted
-    value_t val;
 
     if (stack) {
         n1 = pop_from(stack).integer;
@@ -619,9 +613,9 @@ void inst_shl(FILE *f, corth_stack_t *stack)
 void inst_shr(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
+    value_t val;
     int64 n1 = 0; // shifter
     int64 n2 = 0; // shifted
-    value_t val;
 
     if (stack) {
         n1 = pop_from(stack).integer;
@@ -641,9 +635,9 @@ void inst_shr(FILE *f, corth_stack_t *stack)
 void inst_orb(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
+    value_t val;
     int64 n1 = 0;
     int64 n2 = 0;
-    value_t val;
 
     if (stack) {
         n2 = pop_from(stack).integer;
@@ -663,9 +657,9 @@ void inst_orb(FILE *f, corth_stack_t *stack)
 void inst_andb(FILE *f, corth_stack_t *stack)
 {
     assert(f || stack);
+    value_t val;
     int64 n1 = 0;
     int64 n2 = 0;
-    value_t val;
 
     if (stack) {
         n2 = pop_from(stack).integer;
