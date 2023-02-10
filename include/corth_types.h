@@ -6,4 +6,7 @@ typedef enum s_corth_mode {
     COMPILATION,
 } corth_mode_t;
 
+typedef long long int int64;
+typedef unsigned long long int uint64;
+
 #endif

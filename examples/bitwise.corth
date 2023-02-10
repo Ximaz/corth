@@ -1,0 +1,8 @@
+// shift left
+1  3 shl dump  // Show 8
+// shift right
+32 3 shr dump  // Show 4
+// or byte
+1  2 orb dump  // Show 3
+// and byte
+1  2 andb dump // Show 0

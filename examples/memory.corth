@@ -1,0 +1,13 @@
+// Builds "abc" into the memory.
+mem 0 + 97 store  // Stores 'a' in memory[0]
+mem 1 + 98 store  // Stores 'b' in memory[1]
+mem 2 + 99 store  // Stores 'c' in memory[2]
+
+3 mem 1 1 syscall3 // args : rdx (3), rsi (mem), rdi (stdout)
+
+// Transformes "abc" to "bcd" into the memory.
+mem 0 + dup load 1 + store // Stores 'b' in memory[0]
+mem 1 + dup load 1 + store // Stores 'c' in memory[1]
+mem 2 + dup load 1 + store // Stores 'd' in memory[2]
+
+3 mem 1 1 syscall3 // args : rdx (3), rsi (mem), rdi (stdout)

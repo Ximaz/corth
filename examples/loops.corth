@@ -1,0 +1,6 @@
+9 while dup 0 > do
+    dup 48 + 2dup mem swap store
+    2 mem 1 1 syscall3
+    pop pop
+    1 -
+end

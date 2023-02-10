@@ -1,0 +1,33 @@
+mem 102 + 1 store
+
+0 while dup 102 < do
+   0 while dup 104 < do
+      dup mem + load if
+         dup mem + 104 + 42 store
+      else
+         dup mem + 104 + 32 store
+      end
+      1 +
+   end
+   mem + 104 + 10 store
+   165 mem 104 + 1 1 syscall3
+
+   // pattern
+   mem     load 1 shl
+   mem 1 + load
+   orb
+
+   1 while dup 102 < do
+      swap 1 shl 7 andb
+      over mem + 1 + load orb
+      2dup 110 swap shr 1 andb
+      swap mem + swap store
+      swap
+
+      1 +
+   end
+   pop pop
+
+   1 +
+end
+pop

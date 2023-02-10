@@ -5,7 +5,7 @@ NAME		=	corth
 endif
 CC			=	gcc
 CPPFLAGS	=	-Wall -Wextra -Werror -g -Iinclude -Wno-unused-parameter
-SRC			=	$(wildcard src/*.c)
+SRC			=	$(wildcard src/*.c src/*/*.c)
 OBJ			=	$(SRC:.c=.o)
 
 .SILENT:

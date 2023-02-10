@@ -23,20 +23,20 @@ static char *read_file(FILE *fp)
 
 int corth(char const *filename, corth_mode_t mode)
 {
-    FILE *fp = fopen(filename, "r");
+    int status = 0;
     char *content = 0;
+    tok_lst_t *tokens = 0;
+    FILE *fp = fopen(filename, "r");
 
     if (!fp)
         return -1;
-    if (!(content = read_file(fp))) {
-        fclose(fp);
-        return -1;
-    }
-    if (mode == SIMULATION)
-        simulate(content);
-    if (mode == COMPILATION)
-        compile(content);
-    free(content);
+    content = read_file(fp);
     fclose(fp);
-    return 0;
+    if (!content)
+        return -1;
+    tokens = lex_content(filename, content);
+    status = run_program(tokens, mode, "output.asm");
+    destroy_tokens(tokens);
+    free(content);
+    return status;
 }
