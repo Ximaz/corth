@@ -55,69 +55,70 @@ char *unescape(char *string)
 
 void asm_dump(FILE *f)
 {
-    fprintf(f, ";; -- DUMP --\n");
-    fprintf(f, ";; -9223372036854775807 <= rdi <= 9223372036854775807\n");
-    fprintf(f, "dump: ; Checks the number's nature. (n >= 0 ? / n <= 9 ?)\n");
-    fprintf(f, "    push rbx\n");
-    fprintf(f, "    mov rbx, rdi\n");
-    fprintf(f, "    sub rsp, 16\n");
-    fprintf(f, "    cmp rdi, 9\n");
-    fprintf(f, "    lea rsi, [rsp+15]\n");
-    fprintf(f, "    ja .L3\n");
-    fprintf(f, ".L5: ; Puts the digit into the stdout.\n");
-    fprintf(f, "    mov edi, 1\n");
-    fprintf(f, "    lea r8d, [rbx+48]\n");
-    fprintf(f, "    mov BYTE [rsp+15], r8b\n");
-    fprintf(f, "    mov eax, edi\n");
-    fprintf(f, "    mov edx, edi\n");
-    fprintf(f, "    syscall\n");
-    fprintf(f, "    add rsp, 16\n");
-    fprintf(f, "    pop rbx\n");
-    fprintf(f, "    ret\n");
-    fprintf(f, ".L3: ; Puts the '-' and absolutize the number.\n");
-    fprintf(f, "    test rdi, rdi\n");
-    fprintf(f, "    jns .L4\n");
-    fprintf(f, "    mov edi, 1\n");
-    fprintf(f, "    mov BYTE [rsp+15], '-'\n");
-    fprintf(f, "    mov eax, edi\n");
-    fprintf(f, "    mov edx, edi\n");
-    fprintf(f, "    syscall\n");
-    fprintf(f, "    mov rax, rbx\n");
-    fprintf(f, "    neg rax\n");
-    fprintf(f, "    cmp rbx, -9\n");
-    fprintf(f, "    mov rbx, rax\n");
-    fprintf(f, "    jge .L5\n");
-    fprintf(f, ".L4: ; Do the maths to extract a digit and loop again with the rest. \n");
-    fprintf(f, "    mov rax, rbx\n");
-    fprintf(f, "    mov ecx, 10\n");
-    fprintf(f, "    cqo\n");
-    fprintf(f, "    idiv rcx\n");
-    fprintf(f, "    mov rdi, rax\n");
-    fprintf(f, "    mov rbx, rdx\n");
-    fprintf(f, "    call dump\n");
-    fprintf(f, "    lea rsi, [rsp+15]\n");
-    fprintf(f, "    jmp .L5\n");
+    fprintf(f, "\t;; -- DUMP --\n");
+    fprintf(f, "\t;; -9223372036854775807 <= rdi <= 9223372036854775807\n");
+    fprintf(f, "dump:\n");
+    fprintf(f, "\tpush rbx\n");
+    fprintf(f, "\tmov rbx, rdi\n");
+    fprintf(f, "\tsub rsp, 16\n");
+    fprintf(f, "\tcmp rdi, 9\n");
+    fprintf(f, "\tlea rsi, [rsp+15]\n");
+    fprintf(f, "\tja .L3\n");
+    fprintf(f, "\n\t.L5: ; Puts the digit into the stdout.\n");
+    fprintf(f, "\tmov edi, 1\n");
+    fprintf(f, "\tlea r8d, [rbx+48]\n");
+    fprintf(f, "\tmov BYTE [rsp+15], r8b\n");
+    fprintf(f, "\tmov eax, edi\n");
+    fprintf(f, "\tmov edx, edi\n");
+    fprintf(f, "\tsyscall\n");
+    fprintf(f, "\tadd rsp, 16\n");
+    fprintf(f, "\tpop rbx\n");
+    fprintf(f, "\tret\n");
+    fprintf(f, "\n\t.L3: ; Puts the '-' and absolutize the number.\n");
+    fprintf(f, "\ttest rdi, rdi\n");
+    fprintf(f, "\tjns .L4\n");
+    fprintf(f, "\tmov edi, 1\n");
+    fprintf(f, "\tmov BYTE [rsp+15], '-'\n");
+    fprintf(f, "\tmov eax, edi\n");
+    fprintf(f, "\tmov edx, edi\n");
+    fprintf(f, "\tsyscall\n");
+    fprintf(f, "\tmov rax, rbx\n");
+    fprintf(f, "\tneg rax\n");
+    fprintf(f, "\tcmp rbx, -9\n");
+    fprintf(f, "\tmov rbx, rax\n");
+    fprintf(f, "\tjge .L5\n");
+    fprintf(f, "\n\t.L4: ; Do the maths to extract a digit and loop again with the rest. \n");
+    fprintf(f, "\tmov rax, rbx\n");
+    fprintf(f, "\tmov ecx, 10\n");
+    fprintf(f, "\tcqo\n");
+    fprintf(f, "\tidiv rcx\n");
+    fprintf(f, "\tmov rdi, rax\n");
+    fprintf(f, "\tmov rbx, rdx\n");
+    fprintf(f, "\tcall dump\n");
+    fprintf(f, "\tlea rsi, [rsp+15]\n");
+    fprintf(f, "\tjmp .L5\n\n");
 }
 
 void asm_header(FILE *f)
 {
-    fprintf(f, "BITS 64\n");
-    fprintf(f, "segment .text\n");
+    fprintf(f, "\tBITS 64\n\n");
+    fprintf(f, "\tsection .text\n");
+    fprintf(f, "\tglobal _start\n\n");
     asm_dump(f);
-    fprintf(f, "global _start\n");
-    fprintf(f, "_start:\n");
+    fprintf(f, "_start:");
 }
 
 void asm_footer(FILE *f)
 {
-    fprintf(f, "    ;; -- EXIT --\n");
-    fprintf(f, "    mov rax, 60\n");
-    fprintf(f, "    xor rdi, rdi\n");
-    fprintf(f, "    syscall\n");
-    fprintf(f, "segment .bss\n");
-    // OPS_MAP[OP_MEM - 2].word because OP_PUSH and OP_STRING are not supported.
-    fprintf(f, "%s: resb %llu\n", BUILTINS[OP_MEM - 2].word, MEMORY_CAPACITY);
-    fprintf(f, "segment .data\n");
+    fprintf(f, "\t;; -- EXIT --\n");
+    fprintf(f, "\tmov rax, 60\n");
+    fprintf(f, "\txor rdi, rdi\n");
+    fprintf(f, "\tsyscall\n\n");
+    fprintf(f, "\tsection .bss\n");
+    // BUILTINS doesn't contain OP_PUSH_INT nor OP_PUSH_STR, so the actual index is
+    // OP_MEM - 2.
+    fprintf(f, "%s: resb %llu\n\n", BUILTINS[OP_MEM - 2].word, MEMORY_CAPACITY);
+    fprintf(f, "\tsection .data\n");
 }
 
 void inst_push(FILE *f, corth_stack_t *stack, int64 n)
@@ -130,8 +131,8 @@ void inst_push(FILE *f, corth_stack_t *stack, int64 n)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- PUSH INT --\n");
-        fprintf(f, "    push %lld\n", n);
+        fprintf(f, "\t;; -- PUSH INT --\n");
+        fprintf(f, "\tpush %lld\n", n);
     }
 }
 
@@ -149,9 +150,9 @@ void inst_string(FILE *f, corth_stack_t *stack, uint64 str_addr, op_t *op)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- PUSH STR --\n");
-        fprintf(f, "    push %llu\n", strlen(op->val.string));
-        fprintf(f, "    push str_%llu\n", str_addr);
+        fprintf(f, "\t;; -- PUSH STR --\n");
+        fprintf(f, "\tpush %lu\n", strlen(op->val.string));
+        fprintf(f, "\tpush str_%llu\n", str_addr);
     }
 }
 
@@ -163,8 +164,8 @@ tok_val_t inst_pop(FILE *f, corth_stack_t *stack)
     if (stack)
         return pop_from(stack);
     if (f) {
-        fprintf(f, "    ;; -- POP --\n");
-        fprintf(f, "    pop rdi\n");
+        fprintf(f, "\t;; -- POP --\n");
+        fprintf(f, "\tpop rdi\n");
     }
     val.integer = 0;
     return val;
@@ -184,11 +185,11 @@ void inst_plus(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- PLUS --\n");
-        fprintf(f, "    pop rax ; n1\n");
-        fprintf(f, "    pop rbx ; n2\n");
-        fprintf(f, "    add rax, rbx\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- PLUS --\n");
+        fprintf(f, "\tpop rax ; n1\n");
+        fprintf(f, "\tpop rbx ; n2\n");
+        fprintf(f, "\tadd rax, rbx\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -206,11 +207,11 @@ void inst_minus(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- MINUS --\n");
-        fprintf(f, "    pop rax ; n1\n");
-        fprintf(f, "    pop rbx ; n2\n");
-        fprintf(f, "    sub rbx, rax\n");
-        fprintf(f, "    push rbx\n");
+        fprintf(f, "\t;; -- MINUS --\n");
+        fprintf(f, "\tpop rax ; n1\n");
+        fprintf(f, "\tpop rbx ; n2\n");
+        fprintf(f, "\tsub rbx, rax\n");
+        fprintf(f, "\tpush rbx\n");
     }
 }
 
@@ -224,9 +225,9 @@ void inst_dump(FILE *f, corth_stack_t *stack)
         printf("%lld\n", n1);
     }
     if (f) {
-        fprintf(f, "    ;; -- DUMP --\n");
-        fprintf(f, "    pop rdi\n");
-        fprintf(f, "    call dump\n");
+        fprintf(f, "\t;; -- DUMP --\n");
+        fprintf(f, "\tpop rdi\n");
+        fprintf(f, "\tcall dump\n");
     }
 }
 
@@ -241,10 +242,10 @@ void inst_dupp(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- DUP --\n");
-        fprintf(f, "    pop rax\n");
-        fprintf(f, "    push rax\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- DUP --\n");
+        fprintf(f, "\tpop rax\n");
+        fprintf(f, "\tpush rax\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -263,13 +264,13 @@ void inst_2dupp(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val1);
     }
     if (f) {
-        fprintf(f, "    ;; -- 2DUP --\n");
-        fprintf(f, "    pop rax\n");
-        fprintf(f, "    pop rbx\n");
-        fprintf(f, "    push rbx\n");
-        fprintf(f, "    push rax\n");
-        fprintf(f, "    push rbx\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- 2DUP --\n");
+        fprintf(f, "\tpop rax\n");
+        fprintf(f, "\tpop rbx\n");
+        fprintf(f, "\tpush rbx\n");
+        fprintf(f, "\tpush rax\n");
+        fprintf(f, "\tpush rbx\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -287,14 +288,14 @@ void inst_equal(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- EQUAL --\n");
-        fprintf(f, "    pop rax      ; n1\n");
-        fprintf(f, "    pop rbx      ; n2\n");
-        fprintf(f, "    sub rbx, rax ; n2 - n1\n");
-        fprintf(f, "    xor rax, rax\n");
-        fprintf(f, "    test rbx, rbx\n");
-        fprintf(f, "    sete al\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- EQUAL --\n");
+        fprintf(f, "\tpop rax      ; n1\n");
+        fprintf(f, "\tpop rbx      ; n2\n");
+        fprintf(f, "\tsub rbx, rax ; n2 - n1\n");
+        fprintf(f, "\txor rax, rax\n");
+        fprintf(f, "\ttest rbx, rbx\n");
+        fprintf(f, "\tsete al\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -312,14 +313,14 @@ void inst_diff(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- DIFF --\n");
-        fprintf(f, "    pop rax      ; n1\n");
-        fprintf(f, "    pop rbx      ; n2\n");
-        fprintf(f, "    sub rbx, rax ; n2 - n1\n");
-        fprintf(f, "    xor rax, rax\n");
-        fprintf(f, "    test rbx, rbx\n");
-        fprintf(f, "    setnz al\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- DIFF --\n");
+        fprintf(f, "\tpop rax      ; n1\n");
+        fprintf(f, "\tpop rbx      ; n2\n");
+        fprintf(f, "\tsub rbx, rax ; n2 - n1\n");
+        fprintf(f, "\txor rax, rax\n");
+        fprintf(f, "\ttest rbx, rbx\n");
+        fprintf(f, "\tsetnz al\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -337,13 +338,13 @@ void inst_gt(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- GREATER THAN --\n");
-        fprintf(f, "    pop rcx ; n1\n");
-        fprintf(f, "    pop rbx ; n2\n");
-        fprintf(f, "    xor rax, rax\n");
-        fprintf(f, "    cmp rbx, rcx\n");
-        fprintf(f, "    seta al\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- GREATER THAN --\n");
+        fprintf(f, "\tpop rcx ; n1\n");
+        fprintf(f, "\tpop rbx ; n2\n");
+        fprintf(f, "\txor rax, rax\n");
+        fprintf(f, "\tcmp rbx, rcx\n");
+        fprintf(f, "\tseta al\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -361,13 +362,13 @@ void inst_lt(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- LESS THAN --\n");
-        fprintf(f, "    pop rcx ; n1\n");
-        fprintf(f, "    pop rbx ; n2\n");
-        fprintf(f, "    xor rax, rax\n");
-        fprintf(f, "    cmp rbx, rcx\n");
-        fprintf(f, "    setb al\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- LESS THAN --\n");
+        fprintf(f, "\tpop rcx ; n1\n");
+        fprintf(f, "\tpop rbx ; n2\n");
+        fprintf(f, "\txor rax, rax\n");
+        fprintf(f, "\tcmp rbx, rcx\n");
+        fprintf(f, "\tsetb al\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -385,13 +386,13 @@ void inst_goet(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- GREATER OR EQUAL THAN --\n");
-        fprintf(f, "    pop rcx ; n2\n");
-        fprintf(f, "    pop rbx ; n1\n");
-        fprintf(f, "    xor rax, rax\n");
-        fprintf(f, "    cmp rbx, rcx\n");
-        fprintf(f, "    setae al\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- GREATER OR EQUAL THAN --\n");
+        fprintf(f, "\tpop rcx ; n2\n");
+        fprintf(f, "\tpop rbx ; n1\n");
+        fprintf(f, "\txor rax, rax\n");
+        fprintf(f, "\tcmp rbx, rcx\n");
+        fprintf(f, "\tsetae al\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -409,13 +410,13 @@ void inst_loet(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- LESS OR EQUAL THAN --\n");
-        fprintf(f, "    pop rcx ; n1\n");
-        fprintf(f, "    pop rbx ; n2\n");
-        fprintf(f, "    xor rax, rax\n");
-        fprintf(f, "    cmp rbx, rcx\n");
-        fprintf(f, "    setbe al\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- LESS OR EQUAL THAN --\n");
+        fprintf(f, "\tpop rcx ; n1\n");
+        fprintf(f, "\tpop rbx ; n2\n");
+        fprintf(f, "\txor rax, rax\n");
+        fprintf(f, "\tcmp rbx, rcx\n");
+        fprintf(f, "\tsetbe al\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -427,11 +428,11 @@ int inst_if(FILE *f, corth_stack_t *stack, uint64 end_addr, op_typ_t op_type)
     if (stack)
         return (pop_from(stack).integer == 0);
     if (f) {
-        fprintf(f, "    ;; -- IF --\n");
-        fprintf(f, "    pop rax\n");
-        fprintf(f, "    test al, al\n");
-        fprintf(f, "    ;; -- GOTO %s --\n", OP_CODES[op_type]);
-        fprintf(f, "    jz addr_%llu\n", end_addr);
+        fprintf(f, "\t;; -- IF --\n");
+        fprintf(f, "\tpop rax\n");
+        fprintf(f, "\ttest al, al\n");
+        fprintf(f, "\t;; -- GOTO %s --\n", OP_CODES[op_type]);
+        fprintf(f, "\tjz .addr_%llu\n", end_addr);
     }
     return 0;
 }
@@ -439,15 +440,15 @@ int inst_if(FILE *f, corth_stack_t *stack, uint64 end_addr, op_typ_t op_type)
 void inst_else(FILE *f, uint64 end_addr)
 {
     assert(f);
-    fprintf(f, "    ;; -- GOTO END --\n");
-    fprintf(f, "    jmp addr_%llu\n", end_addr + 1); // + 1 to go after the `end` block.
-    fprintf(f, ";; -- ELSE --\n");
+    fprintf(f, "\t;; -- GOTO END --\n");
+    fprintf(f, "\tjmp .addr_%llu\n", end_addr + 1); // + 1 to go after the `end` block.
+    fprintf(f, "\n\t;; -- ELSE --\n");
 }
 
 void inst_while(FILE *f)
 {
     assert(f);
-    fprintf(f, "    ;; -- WHILE --\n");
+    fprintf(f, "\t;; -- WHILE --\n");
 }
 
 int inst_do(FILE *f, corth_stack_t *stack, uint64 end_addr)
@@ -457,11 +458,11 @@ int inst_do(FILE *f, corth_stack_t *stack, uint64 end_addr)
     if (stack)
         return (pop_from(stack).integer == 0);
     if (f) {
-        fprintf(f, "    ;; -- DO --\n");
-        fprintf(f, "    pop rax\n");
-        fprintf(f, "    test al, al\n");
-        fprintf(f, "    ;; -- GOTO END --\n");
-        fprintf(f, "    jz addr_%llu\n", end_addr + 1); // + 1 to go to the `end` + 1 instruction.
+        fprintf(f, "\t;; -- DO --\n");
+        fprintf(f, "\tpop rax\n");
+        fprintf(f, "\ttest al, al\n");
+        fprintf(f, "\t;; -- GOTO END --\n");
+        fprintf(f, "\tjz .addr_%llu\n", end_addr + 1); // + 1 to go to the `end` + 1 instruction.
     }
     return 0;
 }
@@ -470,8 +471,8 @@ void inst_end(FILE *f, uint64 next_addr)
 {
     assert(f);
 
-    fprintf(f, "    jmp addr_%llu\n", next_addr);
-    fprintf(f, ";; -- END --\n");
+    fprintf(f, "\tjmp .addr_%llu\n", next_addr);
+    fprintf(f, "\t;; -- END --\n");
 }
 
 void inst_mem(FILE *f, corth_stack_t *stack)
@@ -484,8 +485,8 @@ void inst_mem(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- MEM --\n");
-        fprintf(f, "    push mem\n");
+        fprintf(f, "\t;; -- MEM --\n");
+        fprintf(f, "\tpush mem\n");
     }
 }
 
@@ -501,10 +502,10 @@ void inst_store(FILE *f, corth_stack_t *stack, char *fake_mem)
         fake_mem[address] = byte % 0xFF; // Only pushes the lowest bytes of the value, as in assembly.
     }
     if (f) {
-        fprintf(f, "    ;; -- STORE --\n");
-        fprintf(f, "    pop rbx ; contains the byte to store\n");
-        fprintf(f, "    pop rax ; contains the mem pointer\n");
-        fprintf(f, "    mov byte [rax], bl\n");
+        fprintf(f, "\t;; -- STORE --\n");
+        fprintf(f, "\tpop rbx ; contains the byte to store\n");
+        fprintf(f, "\tpop rax ; contains the mem pointer\n");
+        fprintf(f, "\tmov byte [rax], bl\n");
     }
 }
 
@@ -522,11 +523,11 @@ void inst_load(FILE *f, corth_stack_t *stack, char *fake_mem)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- LOAD --\n");
-        fprintf(f, "    pop rbx ; contains the mem pointer\n");
-        fprintf(f, "    xor rax, rax\n");
-        fprintf(f, "    mov al, byte [rbx]\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- LOAD --\n");
+        fprintf(f, "\tpop rbx ; contains the mem pointer\n");
+        fprintf(f, "\txor rax, rax\n");
+        fprintf(f, "\tmov al, byte [rbx]\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -567,21 +568,21 @@ int inst_syscall(FILE *f, corth_stack_t *stack, char *fake_mem, unsigned int val
         assert(0);
     }
     if (f) {
-        fprintf(f, "    ;; -- SYSCALL --\n");
-        fprintf(f, "    pop rax ; the syscall_id\n");
+        fprintf(f, "\t;; -- SYSCALL --\n");
+        fprintf(f, "\tpop rax ; the syscall_id\n");
         if (vals_len >= 1)
-            fprintf(f, "    pop rdi ; 1st val of the syscall\n");
+            fprintf(f, "\tpop rdi ; 1st val of the syscall\n");
         if (vals_len >= 2)
-            fprintf(f, "    pop rsi ; 2nd val of the syscall\n");
+            fprintf(f, "\tpop rsi ; 2nd val of the syscall\n");
         if (vals_len >= 3)
-            fprintf(f, "    pop rdx ; 3rd val of the syscall\n");
+            fprintf(f, "\tpop rdx ; 3rd val of the syscall\n");
         if (vals_len >= 4)
-            fprintf(f, "    pop r10 ; 4th val of the syscall\n");
+            fprintf(f, "\tpop r10 ; 4th val of the syscall\n");
         if (vals_len >= 5)
-            fprintf(f, "    pop r8  ; 5th val of the syscall\n");
+            fprintf(f, "\tpop r8  ; 5th val of the syscall\n");
         if (vals_len == 6)
-            fprintf(f, "    pop r9  ; 6th val of the syscall\n");
-        fprintf(f, "    syscall\n");
+            fprintf(f, "\tpop r9  ; 6th val of the syscall\n");
+        fprintf(f, "\tsyscall\n");
     }
     return 256;
 }
@@ -600,11 +601,11 @@ void inst_shl(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- SHL --\n");
-        fprintf(f, "    pop rcx ; shifter\n");
-        fprintf(f, "    pop rax ; shifted\n");
-        fprintf(f, "    shl rax, cl\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- SHL --\n");
+        fprintf(f, "\tpop rcx ; shifter\n");
+        fprintf(f, "\tpop rax ; shifted\n");
+        fprintf(f, "\tshl rax, cl\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -622,11 +623,11 @@ void inst_shr(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- SHR --\n");
-        fprintf(f, "    pop rcx ; shifter\n");
-        fprintf(f, "    pop rax ; shifted\n");
-        fprintf(f, "    shr rax, cl\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- SHR --\n");
+        fprintf(f, "\tpop rcx ; shifter\n");
+        fprintf(f, "\tpop rax ; shifted\n");
+        fprintf(f, "\tshr rax, cl\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -644,11 +645,11 @@ void inst_orb(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- OR --\n");
-        fprintf(f, "    pop rax ; n1\n");
-        fprintf(f, "    pop rbx ; n1\n");
-        fprintf(f, "    or rax, rbx\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- OR --\n");
+        fprintf(f, "\tpop rax ; n1\n");
+        fprintf(f, "\tpop rbx ; n1\n");
+        fprintf(f, "\tor rax, rbx\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -666,11 +667,11 @@ void inst_andb(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val);
     }
     if (f) {
-        fprintf(f, "    ;; -- AND --\n");
-        fprintf(f, "    pop rax ; n1\n");
-        fprintf(f, "    pop rbx ; n1\n");
-        fprintf(f, "    and rax, rbx\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- AND --\n");
+        fprintf(f, "\tpop rax ; n1\n");
+        fprintf(f, "\tpop rbx ; n1\n");
+        fprintf(f, "\tand rax, rbx\n");
+        fprintf(f, "\tpush rax\n");
     }
 }
 
@@ -687,11 +688,11 @@ void inst_swap(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val2);
     }
     if (f) {
-        fprintf(f, "    ;; -- SWAP --\n");
-        fprintf(f, "    pop rax\n");
-        fprintf(f, "    pop rbx\n");
-        fprintf(f, "    push rax\n");
-        fprintf(f, "    push rbx\n");
+        fprintf(f, "\t;; -- SWAP --\n");
+        fprintf(f, "\tpop rax\n");
+        fprintf(f, "\tpop rbx\n");
+        fprintf(f, "\tpush rax\n");
+        fprintf(f, "\tpush rbx\n");
     }
 }
 
@@ -709,11 +710,11 @@ void inst_over(FILE *f, corth_stack_t *stack)
         push_onto_stack(stack, val1);
     }
     if (f) {
-        fprintf(f, "    ;; -- OVER --\n");
-        fprintf(f, "    pop rbx\n");
-        fprintf(f, "    pop rax\n");
-        fprintf(f, "    push rax\n");
-        fprintf(f, "    push rbx\n");
-        fprintf(f, "    push rax\n");
+        fprintf(f, "\t;; -- OVER --\n");
+        fprintf(f, "\tpop rbx\n");
+        fprintf(f, "\tpop rax\n");
+        fprintf(f, "\tpush rax\n");
+        fprintf(f, "\tpush rbx\n");
+        fprintf(f, "\tpush rax\n");
     }
 }

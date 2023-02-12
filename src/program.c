@@ -180,7 +180,7 @@ int run_program(tok_lst_t *self, corth_mode_t mode, char const *output)
     for (; i < program->ops_len && !exit_found; i++) {
         op = program->ops[i];
         if (mode == COMPILATION)
-            fprintf(f, "addr_%lld:\n", i);
+            fprintf(f, "\n\t.addr_%lld:\n", i);
         switch (op->type) {
             case OP_PUSH_INT:
                 inst_push(f, stack, op->val.integer);
@@ -188,8 +188,8 @@ int run_program(tok_lst_t *self, corth_mode_t mode, char const *output)
             case OP_PUSH_STR:
                 inst_string(f, stack, str_index, op);
                 fake_str_len = strlen(op->val.string);
+                op->val.string = unescape(op->val.string);
                 if (mode == SIMULATION) {
-                    op->val.string = unescape(op->val.string);
                     strncpy(fake_mem + fake_str_i, op->val.string, fake_str_len);
                     fake_str_i += fake_str_len;
                 } else {
@@ -335,10 +335,13 @@ int run_program(tok_lst_t *self, corth_mode_t mode, char const *output)
         }
     }
     if (mode == COMPILATION) {
-        fprintf(f, "addr_%lld:\n", i);
+        fprintf(f, "\n\t.addr_%lld:\n", i);
         asm_footer(f);
         for (--str_index; str_index >= 0; str_index--) {
-            fprintf(f, "str_%llu: db `%s`, 0\n", str_index, fake_strings[str_index]);
+            fprintf(f, "str_%llu: db ", str_index); // %s, 0\n", str_index, serialized);
+            for (int i = 0; fake_strings[str_index][i]; i++)
+                fprintf(f, "%d, ", fake_strings[str_index][i]);
+            fprintf(f, "0\n");
             free(fake_strings[str_index]);
         }
         free(fake_strings);
