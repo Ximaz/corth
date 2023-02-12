@@ -67,7 +67,7 @@ void asm_dump(FILE *f)
     fprintf(f, "\n\t.L5: ; Puts the digit into the stdout.\n");
     fprintf(f, "\tmov edi, 1\n");
     fprintf(f, "\tlea r8d, [rbx+48]\n");
-    fprintf(f, "\tmov BYTE [rsp+15], r8b\n");
+    fprintf(f, "\tmov byte [rsp+15], r8b\n");
     fprintf(f, "\tmov eax, edi\n");
     fprintf(f, "\tmov edx, edi\n");
     fprintf(f, "\tsyscall\n");
@@ -78,7 +78,7 @@ void asm_dump(FILE *f)
     fprintf(f, "\ttest rdi, rdi\n");
     fprintf(f, "\tjns .L4\n");
     fprintf(f, "\tmov edi, 1\n");
-    fprintf(f, "\tmov BYTE [rsp+15], '-'\n");
+    fprintf(f, "\tmov byte [rsp+15], '-'\n");
     fprintf(f, "\tmov eax, edi\n");
     fprintf(f, "\tmov edx, edi\n");
     fprintf(f, "\tsyscall\n");
